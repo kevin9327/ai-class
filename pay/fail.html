@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>결제 실패 — 실무AI클래스</title>
+<meta name="robots" content="noindex" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css" />
+<link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+
+<div class="result-wrap">
+  <div class="icon">😥</div>
+  <h1>결제가 완료되지 않았습니다</h1>
+  <p id="fail-msg">결제가 취소되었거나 처리 중 문제가 발생했습니다. 요금은 청구되지 않았습니다.</p>
+  <a class="btn btn-primary" href="../index.html#courses">강의로 돌아가기</a>
+</div>
+
+<script>
+  (function () {
+    var msg = new URLSearchParams(location.search).get("message");
+    if (msg) {
+      document.getElementById("fail-msg").textContent =
+        msg + " — 요금은 청구되지 않았습니다. 계속 문제가 되면 문의를 남겨주세요.";
+    }
+  })();
+</script>
+
+</body>
+</html>

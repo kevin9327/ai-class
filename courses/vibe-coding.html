@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>클로드 코드로 시작하는 바이브코딩 — 실무AI클래스</title>
+<meta name="description" content="코딩을 몰라도 됩니다. 환경 설정부터 첫 배포까지, 내 아이디어를 실제로 돌아가는 것으로 만드는 1:1 라이브 강의." />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="클로드 코드로 시작하는 바이브코딩 — 실무AI클래스" />
+<meta property="og:description" content="코딩 경험 0에서 시작해 4회 만에 내 아이디어를 배포까지. 1:1 라이브." />
+<meta property="og:image" content="https://kevin9327.github.io/ai-class/assets/img/course-vibe-coding.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css" />
+<link rel="stylesheet" href="../assets/style.css" />
+<script>window.REL = "../";</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
+<script src="https://js.tosspayments.com/v1/payment" defer></script>
+<script src="../assets/config.js" defer></script>
+<script src="../assets/app.js" defer></script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="../index.html">실무<b>AI</b>클래스</a>
+    <nav class="nav">
+      <a href="../index.html#courses">강의</a>
+      <a href="../index.html#how">수강 방식</a>
+      <a href="../index.html#instructor">강사 소개</a>
+      <a href="../index.html#contact">문의</a>
+    </nav>
+    <div class="nav-auth" id="nav-auth"></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <p class="breadcrumb"><a href="../index.html">홈</a> › <a href="../index.html#courses">강의</a> › 바이브코딩</p>
+
+  <div class="course-hero">
+    <div>
+      <img class="thumb" src="../assets/img/course-vibe-coding.png" alt="클로드 코드로 시작하는 바이브코딩" />
+    </div>
+    <div>
+      <div class="badges"><span class="badge">라이브 1:1</span><span class="badge gray">입문 · 코딩 경험 불필요</span></div>
+      <h1>클로드 코드로 시작하는 바이브코딩</h1>
+      <p class="lead">
+        코드를 배우는 수업이 아니라, 만드는 수업입니다. AI에게 시키는 법을 익혀서
+        4회 안에 내 아이디어 하나를 실제로 돌아가는 것으로 만들고 배포까지 합니다.
+      </p>
+
+      <div class="plan-box" id="plans">
+        <div class="plan-item">
+          <div class="meta"><b>1:1 라이브 4회 패키지</b><span>회당 2시간 · 커리큘럼 전체 · 온라인/대면</span></div>
+          <div class="amount"><small>596,000</small>499,000원</div>
+          <button class="btn btn-primary" data-enroll data-course="vibe-coding" data-plan-key="pack4">수강신청</button>
+        </div>
+        <div class="plan-item">
+          <div class="meta"><b>단회 체험</b><span>2시간 · 막힌 지점 하나를 같이 통과</span></div>
+          <div class="amount">149,000원</div>
+          <button class="btn btn-ghost" data-enroll data-course="vibe-coding" data-plan-key="single">신청</button>
+        </div>
+        <div class="plan-item">
+          <div class="meta"><b>소그룹 3~5인</b><span>1인 기준 · 2시간 · 비슷한 목표끼리</span></div>
+          <div class="amount">89,000원</div>
+          <button class="btn btn-ghost" data-enroll data-course="vibe-coding" data-plan-key="group">신청</button>
+        </div>
+      </div>
+      <p class="status" id="pay-status" role="status" aria-live="polite"></p>
+      <p class="notice" style="margin-top:12px;"><b>환불 규정</b> — 첫 수업 전 일정이 안 맞으면 전액 환불, 시작 후에는 남은 회차 기준 환불.</p>
+    </div>
+  </div>
+
+  <section class="detail-section">
+    <h2>이런 분께 맞습니다</h2>
+    <ul class="checks">
+      <li>만들고 싶은 게 있는데 코딩을 배울 엄두가 안 나는 분</li>
+      <li>챗GPT로 코드는 받았는데 내 컴퓨터에서 실행이 안 되는 분</li>
+      <li>클로드 코드·커서 같은 도구 이야기는 들었는데 시작을 못 한 분</li>
+      <li>외주 맡기기 전에 프로토타입을 직접 만들어보고 싶은 분</li>
+    </ul>
+  </section>
+
+  <section class="detail-section">
+    <h2>커리큘럼 (4회)</h2>
+    <div class="curriculum">
+      <div class="lesson">
+        <span class="no">1회</span>
+        <div>
+          <h3>환경 세팅과 첫 실행</h3>
+          <p>설치·터미널·클로드 코드 셋업. 혼자 하면 반나절씩 날아가는 구간을 2시간 안에 통과하고, 첫 결과물을 실행해봅니다.</p>
+        </div>
+      </div>
+      <div class="lesson">
+        <span class="no">2회</span>
+        <div>
+          <h3>첫 프로젝트 완성</h3>
+          <p>간단한 웹페이지나 자동화 스크립트를 처음부터 끝까지. AI에게 시키는 법 — 요구를 쪼개고, 확인하고, 고치게 하는 법을 몸에 붙입니다.</p>
+        </div>
+      </div>
+      <div class="lesson">
+        <span class="no">3회</span>
+        <div>
+          <h3>내 아이디어 만들기</h3>
+          <p>당신이 만들고 싶은 것을 기획에서 구현까지. 막히는 지점이 나올 때마다 푸는 과정 자체가 수업입니다.</p>
+        </div>
+      </div>
+      <div class="lesson">
+        <span class="no">4회</span>
+        <div>
+          <h3>배포와 자립</h3>
+          <p>만든 것을 인터넷에 올려 남에게 보여줄 수 있는 상태로. 이후 혼자 계속 만들어갈 수 있는 루틴과 판단 기준을 넘깁니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="detail-section">
+    <h2>진행 방식</h2>
+    <ul class="checks">
+      <li>온라인은 화면 공유, 대면은 서울·수도권. 회당 2시간</li>
+      <li>수업 중 만든 코드·프롬프트 템플릿은 전부 가져갑니다</li>
+      <li>수강 전 무료 상담 30분으로 목표를 먼저 맞춥니다 — 맞지 않으면 그 자리에서 말씀드립니다</li>
+    </ul>
+    <p style="margin-top:20px;"><a class="btn btn-dark" href="../index.html#contact">무료 상담 신청하기</a></p>
+  </section>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span><b style="color:var(--ink);">실무AI클래스</b> — 막힌 지점부터 시작하는 AI 실무 강의</span>
+    <span>문의: <a href="mailto:petaflo.com@gmail.com">petaflo.com@gmail.com</a></span>
+    <span><a href="../privacy.html">개인정보처리방침</a></span>
+    <span>© 2026 실무AI클래스</span>
+  </div>
+</footer>
+
+</body>
+</html>
