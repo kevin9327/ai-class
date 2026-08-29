@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>기업·기관 AI 교육 — 실무AI클래스</title>
+<meta name="description" content="임직원 생성형 AI 집합교육, 직무별 업무 자동화, AI 에이전트 심화 과정. 출강·온라인 라이브. 인원과 형태를 알려주시면 1영업일 안에 견적을 회신합니다." />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content="기업·기관 AI 교육 — 실무AI클래스" />
+<meta property="og:description" content="챗GPT·클로드 실무부터 AI 에이전트 심화까지. 출강·온라인 라이브, 1영업일 안에 견적 회신." />
+<meta property="og:locale" content="ko_KR" />
+<meta property="og:url" content="https://kevin9327.github.io/ai-class/training.html" />
+<meta property="og:image" content="https://kevin9327.github.io/ai-class/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://kevin9327.github.io/ai-class/og.png" />
+<link rel="canonical" href="https://kevin9327.github.io/ai-class/training.html" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>" />
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css" />
+<link rel="stylesheet" href="./assets/style.css" />
+
+<script>window.REL = "./";</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
+<script src="./assets/config.js" defer></script>
+<script src="./assets/app.js" defer></script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="./index.html">실무<b>AI</b>클래스</a>
+    <nav class="nav">
+      <a href="./index.html#courses">강의</a>
+      <a href="./training.html">기업 교육</a>
+      <a href="./index.html#instructor">강사 소개</a>
+      <a href="#quote">견적 요청</a>
+    </nav>
+    <div class="nav-auth" id="nav-auth"></div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="kicker">기업 · 공공기관 · 단체 — 출강 / 온라인 라이브</p>
+    <h1>임직원이 다음 날부터<br />직접 쓰는 AI 교육</h1>
+    <p class="sub">
+      도구 소개로 끝나는 특강이 아니라, 참석자의 실제 업무를 재료로 실습합니다.
+      교육이 끝나면 각자 자기 업무에 붙일 프롬프트 템플릿을 가져갑니다.
+    </p>
+    <div class="actions">
+      <a class="btn btn-primary btn-lg" href="#quote">견적 요청하기</a>
+      <a class="btn btn-ghost btn-lg" href="#programs">과정 보기</a>
+    </div>
+    <ul class="points">
+      <li>1영업일 안에 견적·커리큘럼 초안 회신</li>
+      <li>기관 상황에 맞게 커리큘럼 조정</li>
+      <li>강의 자료·프롬프트 템플릿 제공</li>
+    </ul>
+  </div>
+</section>
+
+<section class="section" id="programs">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">PROGRAMS</p>
+      <h2>과정 구성</h2>
+      <p>세 과정 모두 반일(3시간) 또는 종일(6시간)로 진행하며, 기관의 직무·수준에 맞게 조정합니다.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step">
+        <span class="num">과정 1 · 입문</span>
+        <h3>생성형 AI 실무 활용</h3>
+        <p>챗GPT·클로드·제미나이를 업무에 바로 쓰는 법. 보고서 초안, 회의록 정리, 자료 요약을 참석자 본인 업무로 실습합니다. 전 직군 대상, AI를 처음 쓰는 분 기준으로 설계합니다.</p>
+      </div>
+      <div class="step">
+        <span class="num">과정 2 · 직무 실습</span>
+        <h3>직무별 업무 자동화</h3>
+        <p>인사·총무·재무 같은 경영지원 직군, 혹은 특정 부서의 반복 업무를 골라 자동화합니다. 엑셀 정리, 문서 생성, 데이터 취합 — 교육 중에 실제 업무 하나를 끝까지 돌립니다.</p>
+      </div>
+      <div class="step">
+        <span class="num">과정 3 · 심화</span>
+        <h3>AI 에이전트 심화</h3>
+        <p>클로드 코드 등 에이전트 도구로 여러 단계 업무를 통째로 맡기는 법. 단순 질의응답을 넘어 파일 처리·반복 작업 파이프라인까지, 실무에서 매일 쓰는 방식 그대로 보여드립니다.</p>
+      </div>
+    </div>
+    <p class="status" style="margin-top:18px;">
+      "챗GPT는 써봤는데 그다음을 모르겠다"는 조직이라면 과정 2부터, 처음 도입이라면 과정 1부터 권합니다. 섞어서 구성해도 됩니다.
+    </p>
+  </div>
+</section>
+
+<section class="section alt">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">FORMAT</p>
+      <h2>진행 형태</h2>
+    </div>
+    <div class="steps-grid">
+      <div class="step">
+        <span class="num">출강</span>
+        <h3>집합 교육</h3>
+        <p>기관을 방문해 진행합니다. 강의형은 인원 제한이 없고, 실습형은 20~30명 이내를 권합니다. 빔프로젝터와 참석자 노트북(실습형)만 준비해 주시면 됩니다.</p>
+      </div>
+      <div class="step">
+        <span class="num">온라인</span>
+        <h3>라이브 원격</h3>
+        <p>Zoom 등 화상회의로 진행합니다. 지역 제한이 없고, 화면 공유로 실습 과정을 그대로 따라올 수 있습니다.</p>
+      </div>
+      <div class="step">
+        <span class="num">시간</span>
+        <h3>반일 · 종일</h3>
+        <p>특강형 90분, 반일 3시간, 종일 6시간 중 선택합니다. 실습을 원하시면 반일 이상을 권합니다.</p>
+      </div>
+      <div class="step">
+        <span class="num">견적</span>
+        <h3>1영업일 회신</h3>
+        <p>인원·시간·형태·지역을 알려주시면 견적서와 커리큘럼 초안을 함께 보내드립니다. 세금계산서 발행 가능 여부 등 행정 조건도 회신에 담습니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="why">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">INSTRUCTOR</p>
+      <h2>매일 실무에서 쓰는 사람이 강의합니다</h2>
+    </div>
+    <div class="instructor">
+      <div class="avatar">K</div>
+      <div>
+        <h3>케빈 (Kevin)</h3>
+        <p>안드로이드 앱과 웹 서비스를 직접 만들어 운영하고 있고, Claude Code와 Codex를 매일 실무에 씁니다. 강의에서 보여드리는 방식은 시연용이 아니라 제가 실제로 일하는 방식입니다.</p>
+        <ul>
+          <li>구글 플레이 스토어에 앱 다수 직접 개발·출시·운영</li>
+          <li>오픈소스 프로젝트에 AI 도구 활용 기여 다수 (GitHub: kevin9327)</li>
+          <li>제조 대기업 재직 — 실무 데이터·문서 업무를 AI로 처리하는 게 일상</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section alt">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">FAQ</p>
+      <h2>자주 묻는 질문</h2>
+    </div>
+    <div class="faq">
+      <details>
+        <summary>비용은 어떻게 되나요?</summary>
+        <p>인원·시간·형태·지역에 따라 달라져서 일괄 단가를 걸어두지 않습니다. 조건을 알려주시면 1영업일 안에 견적서를 보내드리고, 예산 범위를 먼저 알려주시면 그 안에서 구성안을 제안합니다.</p>
+      </details>
+      <details>
+        <summary>참석자 수준이 제각각인데 괜찮을까요?</summary>
+        <p>대부분의 기관이 그렇습니다. 실습 과제를 수준별로 두 갈래 준비하고, 빠른 분에게는 심화 과제를 드리는 방식으로 운영합니다. 사전 설문 1장을 드려 수준 분포를 미리 파악합니다.</p>
+      </details>
+      <details>
+        <summary>보안 때문에 사내에서 AI 사용이 제한됩니다.</summary>
+        <p>기관 보안 정책 안에서 쓸 수 있는 도구 기준으로 커리큘럼을 조정합니다. 어떤 데이터를 넣으면 안 되는지 구분하는 법 자체를 교육 앞부분에서 다룹니다.</p>
+      </details>
+      <details>
+        <summary>교육 후 지원이 있나요?</summary>
+        <p>교육에 쓴 자료와 프롬프트 템플릿을 전부 드리고, 교육 후 2주간 이메일 질문을 받습니다. 정기 후속 교육이 필요하면 별도로 구성해 드립니다.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="quote">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">QUOTE</p>
+      <h2>견적 요청</h2>
+      <p>아는 만큼만 적어주셔도 됩니다. 미정인 항목은 회신에서 선택지로 정리해 드립니다.</p>
+    </div>
+
+    <form class="card" id="inquiry"
+          action="https://formsubmit.co/petaflo.com@gmail.com"
+          method="POST"
+          style="max-width:640px;">
+
+      <input type="hidden" name="_subject" value="[실무AI클래스] 기업·기관 교육 견적 요청" />
+      <input type="hidden" name="_template" value="table" />
+      <input type="hidden" name="_captcha" value="false" />
+      <input type="hidden" name="_next" value="https://kevin9327.github.io/ai-class/thanks.html" />
+      <input type="hidden" name="구분" value="기업·기관 교육" />
+      <input type="text" name="_honey" class="trap" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+      <div class="field">
+        <label for="name">회사·기관명과 담당자</label>
+        <input type="text" id="name" name="기관·담당자" autocomplete="organization" placeholder="예) OO시청 교육담당 김OO" required />
+      </div>
+
+      <div class="field">
+        <label for="contact">연락 받을 곳</label>
+        <input type="text" id="contact" name="연락처" placeholder="업무 이메일 또는 전화번호" required />
+      </div>
+
+      <fieldset>
+        <legend>관심 과정 <span class="opt">복수 선택</span></legend>
+        <div class="chips">
+          <label class="chip"><input type="checkbox" name="관심과정" value="생성형 AI 실무" /><span>생성형 AI 실무</span></label>
+          <label class="chip"><input type="checkbox" name="관심과정" value="직무별 업무 자동화" /><span>업무 자동화</span></label>
+          <label class="chip"><input type="checkbox" name="관심과정" value="AI 에이전트 심화" /><span>AI 에이전트 심화</span></label>
+          <label class="chip"><input type="checkbox" name="관심과정" value="미정" /><span>협의해서 결정</span></label>
+        </div>
+      </fieldset>
+
+      <div class="field">
+        <label for="stuck">교육 대상·예상 인원·희망 시기</label>
+        <textarea id="stuck" name="요청내용" placeholder="예) 경영지원팀 15명, 10월 중 반일 집합교육 희망. 챗GPT는 써봤고 문서 업무 자동화가 목표입니다." required></textarea>
+      </div>
+
+      <div class="field">
+        <label for="mode">진행 형태 <span class="opt">선택</span></label>
+        <select id="mode" name="진행형태">
+          <option>출강 집합 교육</option>
+          <option>온라인 라이브</option>
+          <option>아직 모르겠습니다</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg btn-block" id="submit">견적 요청 보내기</button>
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+    </form>
+
+    <p class="status" style="max-width:640px;margin-top:14px;">
+      폼이 불편하시면 이메일로 바로 주셔도 됩니다:
+      <a href="mailto:petaflo.com@gmail.com?subject=%5B기업·기관%20교육%5D%20견적%20요청">petaflo.com@gmail.com</a>
+    </p>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span><b style="color:var(--ink);">실무AI클래스</b> — 막힌 지점부터 시작하는 AI 실무 강의</span>
+    <span>문의: <a href="mailto:petaflo.com@gmail.com">petaflo.com@gmail.com</a></span>
+    <span><a href="./privacy.html">개인정보처리방침</a></span>
+    <span>© 2026 실무AI클래스</span>
+  </div>
+</footer>
+
+</body>
+</html>
