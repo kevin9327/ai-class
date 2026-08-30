@@ -358,6 +358,190 @@
     }).join("");
   }
 
+
+  /* ── 프롬프트 라이브러리 ────────────── */
+  function initPrompts() {
+    var grid = document.getElementById("pl-grid");
+    if (!grid) return;
+
+    var rows = window.PROMPTS || [];
+    var cats = window.PROMPT_CATS || [];
+    var qEl = document.getElementById("pl-q");
+    var clearEl = document.getElementById("pl-clear");
+    var countEl = document.getElementById("pl-count");
+    var catsEl = document.getElementById("pl-cats");
+    var active = "";
+
+    /* 분류 칩 */
+    catsEl.innerHTML = ['<button type="button" class="pl-cat" data-cat="" aria-pressed="true">전체</button>']
+      .concat(cats.map(function (c) {
+        return '<button type="button" class="pl-cat" data-cat="' + esc(c) +
+          '" aria-pressed="false">' + esc(c) + "</button>";
+      })).join("");
+
+    function draw() {
+      var q = (qEl.value || "").trim().toLowerCase();
+      clearEl.hidden = !q;
+
+      var hits = rows.filter(function (r) {
+        if (active && r.cat !== active) return false;
+        if (!q) return true;
+        return (r.title + " " + r.cat + " " + r.when + " " + r.text + " " + r.note)
+          .toLowerCase().indexOf(q) !== -1;
+      });
+
+      countEl.textContent = q || active
+        ? hits.length + "개 (전체 " + rows.length + "개 중)"
+        : "전체 " + rows.length + "개";
+
+      if (!hits.length) {
+        grid.innerHTML = '<p class="empty">찾으시는 게 없습니다. 다른 말로 검색해 보시거나, ' +
+          '아래 상담으로 남겨주시면 만들어 드립니다.</p>';
+        return;
+      }
+
+      grid.innerHTML = hits.map(function (r, i) {
+        return '<article class="pl-item" data-i="' + i + '">' +
+          '<div class="pl-head"><h3>' + esc(r.title) + "</h3>" +
+          '<span class="pl-tag">' + esc(r.cat) + "</span></div>" +
+          '<p class="pl-when">' + esc(r.when) + "</p>" +
+          '<div class="pl-body"><pre>' + esc(r.text) + "</pre></div>" +
+          '<p class="pl-note">' + esc(r.note) + "</p>" +
+          '<div class="pl-actions">' +
+          '<button type="button" class="pl-copy">복사하기</button>' +
+          "</div></article>";
+      }).join("");
+
+      /* 방금 그린 카드에 해당하는 원본을 물려둔다 */
+      Array.prototype.forEach.call(grid.querySelectorAll(".pl-item"), function (el, i) {
+        el.__row = hits[i];
+      });
+      markClipped();
+    }
+
+    /* 글자 수가 아니라 실제로 잘렸는지를 보고 '전체 보기'를 붙인다.
+       한글은 줄바꿈이 달라서 글자 수로 재면 어긋난다. */
+    function markClipped() {
+      Array.prototype.forEach.call(grid.querySelectorAll(".pl-item"), function (el) {
+        if (el.classList.contains("open")) return;
+        var pre = el.querySelector("pre");
+        var cut = pre.scrollHeight > pre.clientHeight + 2;
+        el.classList.toggle("short", !cut);
+        var more = el.querySelector(".pl-more");
+        if (cut && !more) {
+          el.querySelector(".pl-actions").insertAdjacentHTML("beforeend",
+            '<button type="button" class="pl-more">전체 보기</button>');
+        } else if (!cut && more) {
+          more.remove();
+        }
+      });
+    }
+
+    function flash(btn, msg, cls) {
+      if (btn.__t) { clearTimeout(btn.__t); } else { btn.__was = btn.textContent; }
+      btn.textContent = msg;
+      if (cls) btn.classList.add(cls);
+      btn.__t = setTimeout(function () {
+        btn.textContent = btn.__was;
+        btn.classList.remove("done");
+        btn.__t = null;
+      }, 2400);
+    }
+
+    function copyText(item, btn) {
+      var text = item.__row.text;
+      function ok() { flash(btn, "복사했습니다", "done"); }
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(ok, function () { legacy(text, ok, item, btn); });
+      } else {
+        legacy(text, ok, item, btn);
+      }
+    }
+
+    /* 클립보드 권한이 없을 때 쓰는 옛 방식 */
+    function legacy(text, ok, item, btn) {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.cssText = "position:fixed;top:-1000px;opacity:0;";
+      document.body.appendChild(ta);
+      ta.select();
+      var done = false;
+      try { done = document.execCommand("copy"); } catch (e) { done = false; }
+      document.body.removeChild(ta);
+      if (done) { ok(); return; }
+      selectPrompt(item, btn);
+    }
+
+    /* 그것마저 막히면 본문을 대신 선택해 준다. 알림창만 띄우고 끝내지 않는다. */
+    function selectPrompt(item, btn) {
+      item.classList.add("open");
+      var more = item.querySelector(".pl-more");
+      if (more) more.textContent = "접기";
+      var pre = item.querySelector("pre");
+      try {
+        var range = document.createRange();
+        range.selectNodeContents(pre);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        pre.scrollIntoView({ block: "nearest" });
+        flash(btn, "선택했습니다 — Ctrl+C");
+      } catch (e) {
+        flash(btn, "직접 선택해 복사해 주세요");
+      }
+    }
+
+    grid.addEventListener("click", function (e) {
+      var item = e.target.closest ? e.target.closest(".pl-item") : null;
+      if (!item) return;
+      if (e.target.classList.contains("pl-copy")) {
+        copyText(item, e.target);
+      } else if (e.target.classList.contains("pl-more")) {
+        var open = item.classList.toggle("open");
+        e.target.textContent = open ? "접기" : "전체 보기";
+      }
+    });
+
+    catsEl.addEventListener("click", function (e) {
+      var b = e.target.closest ? e.target.closest(".pl-cat") : null;
+      if (!b) return;
+      active = b.getAttribute("data-cat");
+      Array.prototype.forEach.call(catsEl.querySelectorAll(".pl-cat"), function (x) {
+        x.setAttribute("aria-pressed", x === b ? "true" : "false");
+      });
+      draw();
+    });
+
+    var timer = null;
+    qEl.addEventListener("input", function () {
+      clearTimeout(timer);
+      timer = setTimeout(draw, 90);
+    });
+    clearEl.addEventListener("click", function () { qEl.value = ""; draw(); qEl.focus(); });
+
+    /* ?q= 또는 #분류 로 바로 들어오는 경우 */
+    var pq = new URLSearchParams(location.search).get("q");
+    if (pq) qEl.value = pq;
+    var hash = decodeURIComponent((location.hash || "").slice(1));
+    if (hash && cats.indexOf(hash) !== -1) {
+      active = hash;
+      var btn = catsEl.querySelector('[data-cat="' + hash.replace(/"/g, '\\"') + '"]');
+      if (btn) {
+        catsEl.querySelector('[data-cat=""]').setAttribute("aria-pressed", "false");
+        btn.setAttribute("aria-pressed", "true");
+      }
+    }
+    draw();
+
+    var rt = null;
+    window.addEventListener("resize", function () {
+      clearTimeout(rt);
+      rt = setTimeout(markClipped, 150);
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     initHeader();
     initEnrollButtons();
@@ -366,6 +550,7 @@
     initSuccessPage();
     initInquiryForm();
     initLessons();
+    initPrompts();
   });
 
   window.App = { enroll: enroll, PLANS: PLANS, COURSES: COURSES };
