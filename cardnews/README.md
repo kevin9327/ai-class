@@ -4,8 +4,11 @@
 1080×1080 PNG 가 `out/` 에 다시 만들어집니다. 사이트와 같은 팔레트·서체를 씁니다.
 
 ```
-python make_cards.py
+python make_cards.py            # cards.json        → out/
+python make_cards.py prompts    # cards-prompts.json → out/prompts/
 ```
+
+세트를 늘리려면 `cards-<이름>.json` 을 만들고 `python make_cards.py <이름>` 을 돌립니다.
 
 - 결과: `out/card-01.png` … + `out/preview.html`(전부 한눈에 보기)
 - 필요한 것: Playwright + Chromium (이 PC에는 이미 설치돼 있음)
@@ -19,6 +22,13 @@ python make_cards.py
 | `body` | 흰색 | 본문. `no` 는 주제 라벨(숫자 아님) |
 | `quote` | 남색 | 정리·인용 |
 | `cta` | 남색 | 마지막 장. `action` 에 주소 |
+
+## 지금 있는 세트
+
+| 파일 | 내용 | 결과 |
+|---|---|---|
+| `cards.json` | 무료 영상 8강 홍보 | `out/` |
+| `cards-prompts.json` | 프롬프트 라이브러리 홍보 | `out/prompts/` |
 
 ## 올릴 곳
 

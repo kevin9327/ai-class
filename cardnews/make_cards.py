@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 """cards.json -> out/card-01.png ... 1080x1080 카드뉴스를 뽑는다.
 
-실행:  python make_cards.py
-결과:  out/*.png  +  out/preview.html (한 화면에서 전부 보기)
+실행:  python make_cards.py [세트이름]
+       세트이름을 주면 cards-<세트이름>.json 을 읽고 out/<세트이름>/ 에 넣는다.
+       생략하면 cards.json → out/
+결과:  *.png  +  preview.html (한 화면에서 전부 보기)
 """
 import json, pathlib, urllib.parse, sys, io
 
@@ -20,9 +22,16 @@ def main() -> int:
         print("playwright 가 없습니다:  pip install playwright && playwright install chromium")
         return 1
 
-    data = json.loads((HERE / "cards.json").read_text(encoding="utf-8"))
+    which = sys.argv[1] if len(sys.argv) > 1 else ""
+    src = HERE / ("cards-%s.json" % which if which else "cards.json")
+    if not src.exists():
+        print("파일이 없습니다: %s" % src)
+        return 1
+    out = OUT / which if which else OUT
+
+    data = json.loads(src.read_text(encoding="utf-8"))
     cards = data["cards"]
-    OUT.mkdir(exist_ok=True)
+    out.mkdir(parents=True, exist_ok=True)
     tpl = (HERE / "template.html").as_uri()
 
     names = []
@@ -39,11 +48,12 @@ def main() -> int:
             page.evaluate("document.fonts.ready")
             page.wait_for_timeout(350)
             name = "card-%02d.png" % (i + 1)
-            page.screenshot(path=str(OUT / name))
+            page.screenshot(path=str(out / name))
             names.append(name)
             print("  %s  %s" % (name, c["title"].replace("\n", " ")[:40]))
         browser.close()
 
+    print()
     prev = ["<!doctype html><meta charset=utf-8><title>카드뉴스 미리보기</title>",
             "<style>body{margin:0;background:#eef2f7;font-family:Pretendard,sans-serif;padding:28px;}",
             "h1{font-size:18px;color:#334155}",
@@ -52,10 +62,10 @@ def main() -> int:
             "<h1>카드뉴스 %d장 — 1080×1080</h1><div class=g>" % len(names)]
     prev += ['<img src="%s" alt="">' % n for n in names]
     prev.append("</div>")
-    (OUT / "preview.html").write_text("\n".join(prev), encoding="utf-8")
+    (out / "preview.html").write_text("\n".join(prev), encoding="utf-8")
 
-    print("\n%d장 생성 → %s" % (len(names), OUT))
-    print("미리보기: %s" % (OUT / "preview.html"))
+    print("\n%d장 생성 → %s" % (len(names), out))
+    print("미리보기: %s" % (out / "preview.html"))
     return 0
 
 
