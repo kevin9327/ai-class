@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root{
+    --navy:#0b1b33; --brand:#3182f6; --ink:#0f172a; --ink-2:#475569;
+    --line:#e2e8f0; --paper:#ffffff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1080px;height:1080px;overflow:hidden}
+  body{
+    font-family:"Pretendard","Malgun Gothic",sans-serif;
+    letter-spacing:-.025em; -webkit-font-smoothing:antialiased;
+  }
+  .card{
+    width:1080px;height:1080px;padding:96px 88px;
+    display:flex;flex-direction:column;position:relative;
+    background:var(--paper);color:var(--ink);
+  }
+  .card.dark{background:var(--navy);color:#fff}
+  .card.dark .sub,.card.dark .body{color:#c3d0e4}
+  .card.dark .brandline{color:#7d96bd}
+
+  .no{
+    font-size:30px;font-weight:800;color:var(--brand);
+    letter-spacing:-.01em;margin-bottom:24px;
+  }
+  .kicker{
+    font-size:32px;font-weight:700;color:#8fb6f6;
+    letter-spacing:0;margin-bottom:34px;
+  }
+  .title{
+    font-size:78px;font-weight:800;line-height:1.28;
+    white-space:pre-line;letter-spacing:-.035em;
+  }
+  .card.cover .title{font-size:104px;line-height:1.18}
+  .card.quote .title{font-size:64px;line-height:1.36}
+  .card.cta .title{font-size:96px}
+
+  .sub{
+    margin-top:34px;font-size:36px;font-weight:500;line-height:1.55;
+    color:var(--ink-2);white-space:pre-line;
+  }
+  .body{
+    margin-top:40px;font-size:40px;font-weight:500;line-height:1.62;
+    color:var(--ink-2);white-space:pre-line;
+  }
+  .rule{width:96px;height:8px;background:var(--brand);border-radius:4px;margin-top:44px}
+
+  .content{flex:1;display:flex;flex-direction:column;justify-content:center}
+  .foot{
+    display:flex;align-items:center;justify-content:space-between;
+    border-top:2px solid var(--line);padding-top:30px;
+  }
+  .card.dark .foot{border-top-color:#1e3358}
+  .brandline{font-size:30px;font-weight:700;color:var(--ink-2)}
+  .brandline b{color:var(--brand)}
+  .page{font-size:28px;font-weight:600;color:#94a3b8;font-variant-numeric:tabular-nums}
+
+  .action{
+    margin-top:44px;display:inline-flex;align-self:flex-start;
+    background:var(--brand);color:#fff;font-size:38px;font-weight:700;
+    padding:26px 46px;border-radius:18px;
+  }
+</style></head>
+<body><div id="root"></div>
+<script>
+  const P = new URLSearchParams(location.search);
+  const D = JSON.parse(decodeURIComponent(P.get("d")));
+  const c = D.card, i = D.i, n = D.n;
+  const dark = c.type === "cover" || c.type === "quote" || c.type === "cta";
+
+  let inner = "";
+  if (c.kicker) inner += `<div class="kicker">${c.kicker}</div>`;
+  if (c.no)     inner += `<div class="no">${c.no}</div>`;
+  inner += `<h1 class="title">${c.title}</h1>`;
+  if (c.type === "cover" || c.type === "quote") inner += `<div class="rule"></div>`;
+  if (c.sub)    inner += `<p class="sub">${c.sub}</p>`;
+  if (c.body)   inner += `<p class="body">${c.body}</p>`;
+  if (c.action) inner += `<div class="action">${c.action}</div>`;
+  inner = `<div class="content">${inner}</div>` +
+    `<div class="foot">
+      <span class="brandline">실무<b>AI</b>클래스</span>
+      <span class="page">${i + 1} / ${n}</span>
+    </div>`;
+
+  document.getElementById("root").outerHTML =
+    `<div class="card ${c.type} ${dark ? "dark" : ""}">${inner}</div>`;
+  document.title = "ready";
+</script></body></html>
