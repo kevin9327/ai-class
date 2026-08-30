@@ -320,6 +320,44 @@
     });
   }
 
+
+  /* ── 무료 영상 강의 목록 ────────────── */
+  function initLessons() {
+    var host = document.getElementById("lesson-list");
+    if (!host) return;
+
+    var rows = window.LESSONS || [];
+    if (!rows.length) {
+      host.innerHTML = '<p class="empty">강의를 준비하고 있습니다.</p>';
+      return;
+    }
+
+    host.innerHTML = rows.map(function (L, i) {
+      var yt = (L.yt || "").trim();
+      /* 유튜브 ID 형식만 통과시킨다 */
+      var box = /^[A-Za-z0-9_-]{6,20}$/.test(yt)
+        ? '<div class="video-box"><iframe src="https://www.youtube-nocookie.com/embed/' + yt +
+          '?rel=0" title="' + esc(L.title) + '" loading="lazy" allowfullscreen ' +
+          'allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>'
+        : '<div class="video-box pending"><b>준비 중입니다</b>' +
+          '<span>영상이 올라오면 이 자리에서 바로 보실 수 있습니다.</span></div>';
+
+      var bullets = (L.points || []).map(function (t) {
+        return "<li>" + esc(t) + "</li>";
+      }).join("");
+
+      return '<details class="lesson"' + (i === 0 ? " open" : "") + '>' +
+        '<summary><span class="no">' + (i + 1) + '강</span>' +
+        '<span class="ttl">' + esc(L.title) + '</span>' +
+        (L.len ? '<span class="len">' + esc(L.len) + '</span>' : '') +
+        '</summary>' +
+        '<div class="inner">' + box +
+        '<p class="sum">' + esc(L.sum || "") + '</p>' +
+        (bullets ? "<ul>" + bullets + "</ul>" : "") +
+        '</div></details>';
+    }).join("");
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     initHeader();
     initEnrollButtons();
@@ -327,6 +365,7 @@
     initMyPage();
     initSuccessPage();
     initInquiryForm();
+    initLessons();
   });
 
   window.App = { enroll: enroll, PLANS: PLANS, COURSES: COURSES };

@@ -355,3 +355,72 @@ fieldset { border: 0; padding: 0; margin: 0 0 20px; }
   * { transition: none !important; animation: none !important; }
   html { scroll-behavior: auto; }
 }
+
+/* ── 무료 영상 강의 ───────────────── */
+.lesson-list { display: flex; flex-direction: column; gap: 14px; }
+
+.lesson {
+  background: var(--bg);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.lesson > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 18px 22px;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+.lesson > summary::-webkit-details-marker { display: none; }
+.lesson > summary::after { content: "+"; margin-left: auto; color: var(--ink-3); font-weight: 400; font-size: 1.2rem; }
+.lesson[open] > summary::after { content: "−"; }
+.lesson > summary:hover { background: var(--bg-soft); }
+.lesson .no { color: var(--brand); font-weight: 800; font-size: 0.85rem; white-space: nowrap; }
+.lesson .ttl { flex: 1; }
+.lesson .len { color: var(--ink-3); font-size: 0.82rem; font-weight: 500; white-space: nowrap; }
+
+.lesson .inner { padding: 0 22px 22px; display: flex; flex-direction: column; gap: 14px; }
+.lesson .sum { margin: 0; color: var(--ink-2); font-size: 0.94rem; }
+.lesson ul { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 0.92rem; }
+.lesson ul li { margin: 3px 0; }
+
+.video-box {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--navy);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.video-box iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-box.pending {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #cbd5e1;
+  text-align: center;
+  padding: 20px;
+}
+.video-box.pending b { color: #fff; font-size: 1rem; font-weight: 700; }
+.video-box.pending span { font-size: 0.86rem; }
+
+.lesson-cta {
+  margin-top: 26px;
+  background: var(--bg-soft);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  padding: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.lesson-cta h3 { margin: 0 0 4px; font-size: 1.06rem; font-weight: 800; }
+.lesson-cta p { margin: 0; color: var(--ink-2); font-size: 0.93rem; }
