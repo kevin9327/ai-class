@@ -336,12 +336,17 @@
 
     host.innerHTML = rows.map(function (L, i) {
       var yt = (L.yt || "").trim();
-      /* 유튜브 ID 형식만 통과시킨다. 없으면 아예 자리를 만들지 않는다. */
-      var box = /^[A-Za-z0-9_-]{6,20}$/.test(yt)
-        ? '<div class="video-box"><iframe src="https://www.youtube-nocookie.com/embed/' + yt +
+      var mp4 = (L.mp4 || "").trim();
+      var box = "";
+      /* 파일명·유튜브 ID 형식만 통과시킨다. 둘 다 없으면 자리를 만들지 않는다. */
+      if (/^[A-Za-z0-9_.-]+\.mp4$/.test(mp4)) {
+        box = '<div class="video-box"><video controls preload="metadata" playsinline ' +
+          'src="' + REL + 'assets/video/' + mp4 + '"></video></div>';
+      } else if (/^[A-Za-z0-9_-]{6,20}$/.test(yt)) {
+        box = '<div class="video-box"><iframe src="https://www.youtube-nocookie.com/embed/' + yt +
           '?rel=0" title="' + esc(L.title) + '" loading="lazy" allowfullscreen ' +
-          'allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>'
-        : "";
+          'allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>';
+      }
 
       var bullets = (L.points || []).map(function (t) {
         return "<li>" + esc(t) + "</li>";
