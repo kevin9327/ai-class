@@ -1,8 +1,19 @@
-# 영상 원고 (NotebookLM 소스)
+# 강의 원고
 
-`lesson-1.md` ~ `lesson-8.md` 는 **NotebookLM에 넣을 소스 원고**입니다.
-영상 자체는 NotebookLM이 만들지만, 무엇을 말할지는 이 원고가 정합니다.
-소스가 부실하면 결과물도 일반론이 됩니다.
+`lesson-1.md` ~ `lesson-8.md` 는 **두 곳에 쓰입니다.**
+
+1. **사이트 본문** — `python scripts/build_lessons.py` 를 돌리면
+   `assets/lessons-content.js` 가 만들어지고, 그게 무료 강의 페이지의 본문입니다.
+   원고를 고치면 이걸 다시 돌리고 커밋하세요.
+2. **NotebookLM 소스** — 영상을 만들 때 그대로 넣습니다.
+   소스가 부실하면 결과물도 일반론이 됩니다.
+
+```
+python scripts/build_lessons.py
+```
+
+원고가 곧 사이트 본문이므로, 영상이 없어도 페이지는 완결돼 있습니다.
+영상은 올라오는 대로 본문 위에 붙습니다.
 
 ## 만드는 순서
 

@@ -332,19 +332,23 @@
       return;
     }
 
+    var bodies = window.LESSON_BODIES || {};
+
     host.innerHTML = rows.map(function (L, i) {
       var yt = (L.yt || "").trim();
-      /* 유튜브 ID 형식만 통과시킨다 */
+      /* 유튜브 ID 형식만 통과시킨다. 없으면 아예 자리를 만들지 않는다. */
       var box = /^[A-Za-z0-9_-]{6,20}$/.test(yt)
         ? '<div class="video-box"><iframe src="https://www.youtube-nocookie.com/embed/' + yt +
           '?rel=0" title="' + esc(L.title) + '" loading="lazy" allowfullscreen ' +
           'allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>'
-        : '<div class="video-box pending"><b>준비 중입니다</b>' +
-          '<span>영상이 올라오면 이 자리에서 바로 보실 수 있습니다.</span></div>';
+        : "";
 
       var bullets = (L.points || []).map(function (t) {
         return "<li>" + esc(t) + "</li>";
       }).join("");
+
+      /* 본문은 scripts/lesson-N.md 에서 만들어진 것. 이미 이스케이프돼 있다. */
+      var body = bodies[i + 1] || "";
 
       return '<details class="lesson"' + (i === 0 ? " open" : "") + '>' +
         '<summary><span class="no">' + (i + 1) + '강</span>' +
@@ -354,7 +358,8 @@
         '<div class="inner">' + box +
         '<p class="sum">' + esc(L.sum || "") + '</p>' +
         (bullets ? "<ul>" + bullets + "</ul>" : "") +
-        '</div></details>';
+        (body ? '<div class="lesson-body">' + body + "</div>" : "") +
+        "</div></details>";
     }).join("");
   }
 
