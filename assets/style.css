@@ -564,3 +564,26 @@ fieldset { border: 0; padding: 0; margin: 0 0 20px; }
   margin: 0; font-size: 0.85rem; color: var(--ink-3);
   display: flex; align-items: center; gap: 6px;
 }
+
+/* ── 과정 도식 ───────────────────────── */
+.prog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+@media (max-width: 900px) { .prog-grid { grid-template-columns: 1fr; max-width: 520px; } }
+
+.prog {
+  background: var(--bg); border: 1px solid var(--line-soft);
+  border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
+  display: flex; flex-direction: column;
+}
+.prog img { aspect-ratio: 16/9; object-fit: cover; width: 100%; }
+.prog .body { padding: 18px 20px 22px; display: flex; flex-direction: column; gap: 8px; }
+.prog .num { font-weight: 800; color: var(--brand); font-size: 0.85rem; }
+.prog h3 { margin: 0; font-size: 1.06rem; font-weight: 800; letter-spacing: -0.015em; }
+.prog p { margin: 0; font-size: 0.92rem; color: var(--ink-2); }
+
+/* ── 확인 가능한 이력 ────────────────── */
+.proof { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+@media (max-width: 700px) { .proof { grid-template-columns: 1fr; } }
+.proof div { background: var(--bg); padding: 20px 22px; display: flex; flex-direction: column; gap: 3px; }
+.proof b { font-size: 1.7rem; font-weight: 800; color: var(--brand); line-height: 1.15; font-variant-numeric: tabular-nums; }
+.proof span { font-size: 0.88rem; color: var(--ink-2); }
+.proof small { font-size: 0.8rem; color: var(--ink-3); }
