@@ -326,15 +326,29 @@
     var host = document.getElementById("lesson-list");
     if (!host) return;
 
-    var rows = window.LESSONS || [];
+    /* 영상이 붙은 강만 내보낸다. 강 번호는 원래 순번을 그대로 쓴다. */
+    var all = window.LESSONS || [];
+    var rows = [];
+    all.forEach(function (L, i) {
+      var ok = /^[A-Za-z0-9_.-]+\.mp4$/.test((L.mp4 || "").trim()) ||
+               /^[A-Za-z0-9_-]{6,20}$/.test((L.yt || "").trim());
+      if (ok) rows.push({ L: L, n: i + 1 });
+    });
+
     if (!rows.length) {
       host.innerHTML = '<p class="empty">강의를 준비하고 있습니다.</p>';
       return;
     }
 
+    /* 페이지 곳곳의 강 수를 실제 공개된 수에 맞춘다 */
+    Array.prototype.forEach.call(document.querySelectorAll("[data-lesson-count]"), function (el) {
+      el.textContent = rows.length;
+    });
+
     var bodies = window.LESSON_BODIES || {};
 
-    host.innerHTML = rows.map(function (L, i) {
+    host.innerHTML = rows.map(function (row, i) {
+      var L = row.L;
       var yt = (L.yt || "").trim();
       var mp4 = (L.mp4 || "").trim();
       var box = "";
@@ -353,10 +367,10 @@
       }).join("");
 
       /* 본문은 scripts/lesson-N.md 에서 만들어진 것. 이미 이스케이프돼 있다. */
-      var body = bodies[i + 1] || "";
+      var body = bodies[row.n] || "";
 
       return '<details class="lesson"' + (i === 0 ? " open" : "") + '>' +
-        '<summary><span class="no">' + (i + 1) + '강</span>' +
+        '<summary><span class="no">' + row.n + '강</span>' +
         '<span class="ttl">' + esc(L.title) + '</span>' +
         (L.len ? '<span class="len">' + esc(L.len) + '</span>' : '') +
         '</summary>' +
