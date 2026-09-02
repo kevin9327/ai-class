@@ -600,3 +600,14 @@ fieldset { border: 0; padding: 0; margin: 0 0 20px; }
   border-top: 1px solid var(--line-soft); background: var(--bg-soft);
 }
 .shot figcaption a { color: var(--brand); font-weight: 600; }
+
+/* ── 결제: 구매자 미니폼 · 결제 후 일정 요청 ───────────── */
+.buyer-form { margin-top: 14px; padding: 16px 18px; border: 1px solid var(--line-soft); border-radius: var(--radius); background: var(--bg-soft); }
+.buyer-form .buyer-title { margin: 0 0 10px; font-size: 0.92rem; color: var(--ink-2); }
+.buyer-form .buyer-grid { display: grid; grid-template-columns: 1fr 1.4fr auto; gap: 8px; align-items: stretch; }
+.buyer-form .buyer-grid .btn { white-space: nowrap; }
+.buyer-form .buyer-note { margin: 10px 0 0; font-size: 0.8rem; color: var(--ink-3); }
+.after-pay:not([hidden]) { display: block; margin-top: 22px; padding: 22px 22px 8px; border: 2px solid var(--brand); border-radius: var(--radius); background: #fff; }
+.after-pay h3 { margin: 0 0 6px; font-size: 1.08rem; font-weight: 800; }
+.after-pay > p { margin: 0 0 16px; font-size: 0.9rem; color: var(--ink-2); }
+@media (max-width: 720px) { .buyer-form .buyer-grid { grid-template-columns: 1fr; } }

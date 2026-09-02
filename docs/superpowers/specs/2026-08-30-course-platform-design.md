@@ -80,3 +80,13 @@ TOSS_CLIENT_KEY 미설정이면 신청이 토스아이디 송금 링크(금액 �
 1. supabase.com 가입(GitHub 클릭)·로그인 → 프로젝트 생성/설정은 Claude가 브라우저로 진행
 2. 토스페이먼츠 개발자센터 가입 → 테스트 키 발급
 3. petaflo.com@gmail.com에서 FormSubmit 인증 클릭 (기존 건)
+
+## 2026-09-03 변경 — 결제 폴백 교체
+
+토스아이디(toss.me) 서비스가 종료되어 `TOSS_ME` 폴백을 제거했다. 대신 사업자·PG 계약 없이 켜지는 체인으로 바꿨다:
+`PAYAPP_USERID`(페이앱 결제창, 개인 카드 4.0%) → `PAY_LINKS`(플랜별 결제 링크) → `KAKAOPAY_LINK`(송금) → 문의 폼.
+
+- 페이앱은 `recvphone`이 필수라 클릭 시 이름·휴대폰 미니폼(`#buyer-form`)을 먼저 받는다.
+- 결제창은 클릭 핸들러 안에서 동기로 연다(팝업 차단 회피). 그래서 `payapp-lite.js`는 페이지 로드 때 preload.
+- `returnurl`은 쓰지 않는다 — GitHub Pages가 POST를 못 받는다(`skip_cstpage=y`면 POST 이동).
+- 결제 뒤 이행은 강의 페이지의 `#after-pay`(FormSubmit, 구분="결제 완료 일정 요청")로 받는다. 페이앱 판매자 알림 + 이 메일 두 개로 확인.

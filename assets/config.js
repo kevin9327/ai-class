@@ -1,11 +1,23 @@
 /* 사이트 전역 설정 — 값을 채우는 순서대로 기능이 켜집니다.
-   SUPABASE_URL/ANON_KEY: Supabase 프로젝트 생성 후 (로그인·내 강의·주문 활성화)
-   TOSS_CLIENT_KEY: 토스페이먼츠 키 (카드결제창 활성화; test_ck_로 시작하면 테스트 결제)
-   TOSS_ME: 토스아이디 링크 (카드결제 없을 때 송금 폴백; 예 "https://toss.me/아이디") */
+   PAYAPP_USERID   페이앱(payapp.kr) 판매자 아이디 = 판매자센터 로그인 아이디.
+                   채우면 수강신청 버튼이 카드·카카오페이·네이버페이 결제창을 엽니다.
+                   사업자 없는 개인도 가입 가능(카드 4.0%, D+3 정산).
+   PAYAPP_SHOPNAME 결제창에 표시할 상점명
+   PAY_LINKS       플랜별 결제 링크(페이앱 블로그페이 주문서 URL 등). PAYAPP_USERID가 비어 있을 때 새 창으로 엽니다.
+                   키 = "강의-플랜": (vibe-coding|automation|ai-content) × (pack4|single|group)
+   KAKAOPAY_LINK   카카오페이 앱 '코드로 송금받기' 링크(https://qr.kakaopay.com/…). 위 둘이 없을 때 송금 폴백(수수료 0).
+   SUPABASE_URL/ANON_KEY, TOSS_CLIENT_KEY  사업자 등록 뒤 토스페이먼츠로 옮길 때(회원·주문 내역·자동 승인) */
 window.SITE_CONFIG = {
+  PAYAPP_USERID: "",
+  PAYAPP_SHOPNAME: "실무AI클래스",
+  PAY_LINKS: {
+    "vibe-coding-pack4": "", "vibe-coding-single": "", "vibe-coding-group": "",
+    "automation-pack4": "",  "automation-single": "",  "automation-group": "",
+    "ai-content-pack4": "",  "ai-content-single": "",  "ai-content-group": ""
+  },
+  KAKAOPAY_LINK: "",
   SUPABASE_URL: "",
   SUPABASE_ANON_KEY: "",
   TOSS_CLIENT_KEY: "",
-  TOSS_ME: "",
   CONTACT_EMAIL: "petaflo.com@gmail.com"
 };

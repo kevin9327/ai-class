@@ -64,18 +64,115 @@
     });
   }
 
-  /* ── 토스 송금 폴백 ─────────────────────────── */
-  function fallbackPay(planKey) {
-    var plan = PLANS[planKey];
-    if (cfg.TOSS_ME) {
-      var url = cfg.TOSS_ME.replace(/\/+$/, "") + "/" + plan.amount;
-      window.open(url, "_blank", "noopener");
-      payStatus("토스 앱에서 " + plan.amount.toLocaleString("ko-KR") +
-        "원을 보내신 뒤, 문의 폼이나 이메일로 입금자명을 남겨주세요. 확인 즉시 연락드립니다.", "ok");
-    } else {
-      payStatus("카드 결제 오픈을 준비하고 있습니다. 문의를 남겨주시면 결제 방법을 바로 안내해 드립니다.");
-      setTimeout(function () { location.href = REL + "index.html#contact"; }, 1800);
+  /* ── 토스 미설정 시 결제 체인 ───────────────────
+     1) PAYAPP_USERID  → 페이앱 결제창 (카드·카카오페이·네이버페이). 사업자 없는 개인도 가능.
+     2) PAY_LINKS[코드] → 결제 링크 새 창 (페이앱 블로그페이 주문서 등)
+     3) KAKAOPAY_LINK  → 카카오페이 송금 링크 (수수료 0, 입금 수동 확인)
+     4) 없음           → 문의 폼 */
+  var PAYAPP_JS = "https://lite.payapp.kr/public/api/v2/payapp-lite.js";
+
+  function won(n) { return n.toLocaleString("ko-KR") + "원"; }
+  function planCode(courseId, planKey) { return courseId + "-" + planKey; }
+
+  /* 결제창은 클릭 핸들러 안에서 동기로 열어야 팝업 차단을 피한다 → 스크립트를 페이지 로드 때 미리 받아둔다 */
+  function preloadPayApp() {
+    if (!cfg.PAYAPP_USERID || window.PayApp || document.getElementById("payapp-js")) return;
+    var s = document.createElement("script");
+    s.id = "payapp-js"; s.src = PAYAPP_JS; s.async = true;
+    document.head.appendChild(s);
+  }
+
+  /* 결제 뒤 일정 요청 폼(#after-pay)을 펼치고 값을 채운다 */
+  function showAfterPay(courseId, planKey, method, buyer) {
+    var box = document.getElementById("after-pay");
+    if (!box) return;
+    var course = COURSES[courseId], plan = PLANS[planKey];
+    function set(name, val) {
+      var el = box.querySelector('[name="' + name + '"]');
+      if (el && val) el.value = val;
     }
+    set("강의", course.title + " — " + plan.name + " (" + won(plan.amount) + ")");
+    set("결제수단", method);
+    if (buyer) { set("이름", buyer.name); set("연락처", buyer.phone); }
+    box.hidden = false;
+    box.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function openPayApp(courseId, planKey, buyer) {
+    var course = COURSES[courseId], plan = PLANS[planKey];
+    if (!window.PayApp) {
+      payStatus("결제 모듈을 아직 불러오지 못했습니다. 잠시 후 다시 눌러주세요.", "error");
+      preloadPayApp();
+      return;
+    }
+    window.PayApp.setDefault("userid", cfg.PAYAPP_USERID);
+    window.PayApp.setDefault("shopname", cfg.PAYAPP_SHOPNAME || "실무AI클래스");
+    window.PayApp.payrequest({
+      goodname: course.title + " — " + plan.name,
+      price: String(plan.amount),
+      recvphone: buyer.phone,
+      memo: "실무AI클래스 수강료",
+      smsuse: "n",       // 문자 결제요청을 보내지 않고
+      redirectpay: "1",  // 결제창을 바로 연다
+      var1: planCode(courseId, planKey),
+      var2: buyer.name
+    });
+    payStatus("결제창이 열렸습니다. 결제를 마치면 아래 일정 요청을 보내주세요. 24시간 안에 연락드립니다.", "ok");
+    showAfterPay(courseId, planKey, "페이앱 카드결제", buyer);
+  }
+
+  /* 페이앱은 구매자 휴대폰 번호가 필수 → 이름·번호를 받는 작은 폼을 플랜 아래 펼친다 */
+  function askBuyer(courseId, planKey) {
+    var host = document.getElementById("pay-status");
+    if (!host) return;
+    var old = document.getElementById("buyer-form");
+    if (old) old.remove();
+    var plan = PLANS[planKey];
+    var f = document.createElement("form");
+    f.className = "buyer-form"; f.id = "buyer-form";
+    f.innerHTML =
+      '<p class="buyer-title"><b>' + esc(plan.name) + '</b> · ' + won(plan.amount) + '</p>' +
+      '<div class="buyer-grid">' +
+        '<input type="text" name="buyer_name" placeholder="이름" autocomplete="name" required />' +
+        '<input type="text" name="buyer_phone" placeholder="휴대폰 010-0000-0000" autocomplete="tel" inputmode="tel" required />' +
+        '<button type="submit" class="btn btn-primary">결제창 열기</button>' +
+      '</div>' +
+      '<p class="buyer-note">결제창은 페이앱(payapp.kr)에서 열리며 카드·카카오페이·네이버페이를 쓸 수 있습니다. 번호는 결제 확인과 일정 연락에만 씁니다.</p>';
+    host.insertAdjacentElement("beforebegin", f);
+    f.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var name = f.elements.buyer_name.value.trim();
+      var phone = f.elements.buyer_phone.value.replace(/[^0-9]/g, "");
+      if (!name || !/^01[016789][0-9]{7,8}$/.test(phone)) {
+        payStatus("이름과 휴대폰 번호를 확인해주세요.", "error");
+        return;
+      }
+      openPayApp(courseId, planKey, { name: name, phone: phone });
+    });
+    f.elements.buyer_name.focus();
+    payStatus("");
+  }
+
+  function fallbackPay(courseId, planKey) {
+    var plan = PLANS[planKey];
+    var link = (cfg.PAY_LINKS || {})[planCode(courseId, planKey)];
+
+    if (cfg.PAYAPP_USERID) { askBuyer(courseId, planKey); return; }
+
+    if (link) {
+      window.open(link, "_blank", "noopener");
+      payStatus("새 창에서 결제를 마친 뒤, 아래 일정 요청을 보내주세요. 24시간 안에 연락드립니다.", "ok");
+      showAfterPay(courseId, planKey, "결제 링크");
+      return;
+    }
+    if (cfg.KAKAOPAY_LINK) {
+      window.open(cfg.KAKAOPAY_LINK, "_blank", "noopener");
+      payStatus("카카오페이로 " + won(plan.amount) + "을 보내신 뒤, 아래 일정 요청에 입금자명을 적어주세요. 확인 즉시 연락드립니다.", "ok");
+      showAfterPay(courseId, planKey, "카카오페이 송금 " + won(plan.amount));
+      return;
+    }
+    payStatus("온라인 결제를 준비하고 있습니다. 문의를 남겨주시면 결제 방법을 바로 안내해 드립니다.");
+    setTimeout(function () { location.href = REL + "index.html#contact"; }, 1800);
   }
 
   /* ── 수강신청(결제) ─────────────────────────── */
@@ -84,7 +181,7 @@
     var plan = PLANS[planKey];
     if (!course || !plan) return;
 
-    if (!sb) { fallbackPay(planKey); return; }
+    if (!sb) { fallbackPay(courseId, planKey); return; }
 
     sb.auth.getUser().then(function (res) {
       var user = res.data && res.data.user;
@@ -124,7 +221,7 @@
             }
           });
         } else {
-          fallbackPay(planKey);
+          fallbackPay(courseId, planKey);
         }
       });
     });
@@ -232,7 +329,7 @@
           if (r.error) { listEl.innerHTML = '<p class="empty">내역을 불러오지 못했습니다.</p>'; return; }
           var rows = r.data || [];
           if (!rows.length) {
-            listEl.innerHTML = '<p class="empty">아직 수강 내역이 없습니다.<br/>토스 송금으로 결제하신 경우, 확인 후 이곳에 표시됩니다.</p>';
+            listEl.innerHTML = '<p class="empty">아직 수강 내역이 없습니다.<br/>송금으로 결제하신 경우, 확인 후 이곳에 표시됩니다.</p>';
             return;
           }
           listEl.innerHTML = rows.map(function (o) {
@@ -569,6 +666,7 @@
   document.addEventListener("DOMContentLoaded", function () {
     initHeader();
     initEnrollButtons();
+    preloadPayApp();
     initAuthPage();
     initMyPage();
     initSuccessPage();
