@@ -66,7 +66,7 @@
 <body><div id="root"></div>
 <script>
   const P = new URLSearchParams(location.search);
-  const D = JSON.parse(decodeURIComponent(P.get("d")));
+  const D = JSON.parse(P.get("d"));  // URLSearchParams 가 이미 디코딩함
   const c = D.card, i = D.i, n = D.n;
   const dark = c.type === "cover" || c.type === "quote" || c.type === "cta";
 

@@ -6,3 +6,5 @@
 /quote/out/
 # 단가·수신처가 든 견적 데이터도 제외 (사이트는 단가를 공개하지 않음)
 /quote/data/
+__pycache__/
+*.pyc
