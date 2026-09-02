@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<title>견적서</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  /* 흰 바탕, 선으로만 구분. 면 색은 쓰지 않는다. */
+  :root{
+    --ink:#16181a; --ink-2:#4b5563; --ink-3:#8a919b;
+    --line:#e2e5ea; --rule:#0b1b33; --brand:#2f6fd6;
+  }
+  @page{ size:A4; margin:16mm 15mm 18mm; }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#fff;color:var(--ink)}
+  body{
+    font-family:"Pretendard","Malgun Gothic","맑은 고딕",sans-serif;
+    font-size:10.2pt;line-height:1.55;letter-spacing:-.01em;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  }
+  a{color:var(--brand);text-decoration:none}
+  .num{font-variant-numeric:tabular-nums}
+
+  /* 머리 */
+  .head{display:flex;justify-content:space-between;align-items:flex-end;
+        border-bottom:2px solid var(--rule);padding-bottom:10px;margin-bottom:18px}
+  .brand{font-size:15pt;font-weight:800;letter-spacing:-.02em}
+  .brand b{color:var(--brand)}
+  .brand small{display:block;font-size:8.5pt;font-weight:500;color:var(--ink-2);margin-top:2px}
+  .doc{text-align:right}
+  .doc h1{margin:0;font-size:22pt;font-weight:800;letter-spacing:.06em;line-height:1}
+  .doc table{margin-left:auto;margin-top:8px;border-collapse:collapse;font-size:8.8pt}
+  .doc td{padding:1px 0 1px 14px;color:var(--ink-2)}
+  .doc td.v{color:var(--ink);font-weight:600;text-align:right}
+
+  /* 수신·공급자 */
+  .parties{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:18px}
+  .party h3{margin:0 0 6px;font-size:8.5pt;letter-spacing:.14em;color:var(--ink-3);font-weight:700}
+  .party table{border-collapse:collapse;width:100%}
+  .party td{padding:3px 0;vertical-align:top;border-bottom:1px solid var(--line)}
+  .party td:first-child{width:78px;color:var(--ink-2);font-size:9pt}
+  .party td:last-child{font-weight:500}
+  .party .fill{color:var(--brand);font-weight:600}
+
+  /* 섹션 */
+  section{margin-bottom:18px;break-inside:avoid}
+  h2{margin:0 0 8px;font-size:10.5pt;font-weight:800;letter-spacing:-.01em;
+     padding-bottom:5px;border-bottom:1.5px solid var(--rule)}
+  h2 span{font-weight:500;color:var(--ink-3);font-size:8.5pt;margin-left:8px;letter-spacing:0}
+  .note{margin:6px 0 0;font-size:8.8pt;color:var(--ink-2)}
+
+  /* 표 */
+  table.t{border-collapse:collapse;width:100%}
+  table.t th{font-size:8.6pt;font-weight:700;color:var(--ink-2);text-align:left;
+             padding:5px 6px;border-bottom:1.5px solid var(--rule)}
+  table.t td{padding:6px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+  table.t .r{text-align:right}
+  table.t .c{text-align:center}
+  table.t .k{width:96px;color:var(--ink-2);font-size:9.2pt}
+  table.t .sub{font-size:8.6pt;color:var(--ink-2);display:block;margin-top:1px}
+  tr.total td{border-top:1.5px solid var(--rule);border-bottom:none;font-weight:800;font-size:11pt;padding-top:8px}
+  tr.vat td{color:var(--ink-2);border-bottom:none;padding-top:2px;padding-bottom:2px}
+  tr.sup td{border-bottom:none;padding-top:8px;padding-bottom:2px}
+
+  /* 목록 */
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  ul{margin:0;padding-left:16px}
+  li{margin:2px 0}
+  ol{margin:0;padding-left:18px}
+  ol li{margin:3px 0}
+
+  /* 온라인 제안 */
+  .online{display:grid;grid-template-columns:1.1fr 1fr;gap:18px}
+  .online p{margin:0 0 6px}
+  .steps{border-left:2px solid var(--brand);padding-left:12px}
+  .steps div{margin-bottom:6px}
+  .steps b{display:block;font-size:9.4pt}
+  .steps span{font-size:9pt;color:var(--ink-2)}
+
+  /* 강사 */
+  .who{display:grid;grid-template-columns:1fr 150px;gap:18px;align-items:start}
+  .who p{margin:0 0 6px}
+  .proof{display:flex;gap:16px;margin:8px 0 6px}
+  .proof div{border-top:1.5px solid var(--rule);padding-top:5px;min-width:96px}
+  .proof b{display:block;font-size:14pt;font-weight:800;line-height:1.1}
+  .proof span{font-size:8.4pt;color:var(--ink-2)}
+  .links{font-size:8.8pt;color:var(--ink-2)}
+  .links div{margin:1px 0}
+  .qr{text-align:center;font-size:8.2pt;color:var(--ink-2)}
+  .qr img{width:120px;height:120px;display:block;margin:0 auto 4px}
+
+  /* 서명 */
+  .sign{display:flex;justify-content:space-between;align-items:flex-end;margin-top:24px;
+        padding-top:10px;border-top:1px solid var(--line);font-size:9pt;color:var(--ink-2)}
+  .sign b{color:var(--ink);font-size:10pt}
+</style></head>
+<body>
+<div id="root">렌더링 중…</div>
+<script>
+// URLSearchParams 가 이미 퍼센트 인코딩을 풀어준다. 한 번 더 풀면 본문의 "50%" 같은 글자에서 깨진다.
+const D = JSON.parse(new URLSearchParams(location.search).get("d"));
+const won = n => n.toLocaleString("ko-KR") + "원";
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+const supply = D.items.reduce((a, it) => a + it.qty * it.unit, 0);
+const vat = Math.round(supply * 0.1);
+
+const rows = arr => arr.map(([k, v]) => `<tr><td class="k">${esc(k)}</td><td>${esc(v)}</td></tr>`).join("");
+
+let h = `
+<header class="head">
+  <div class="brand">실무<b>AI</b>클래스<small>막힌 지점부터 시작하는 AI 실무 강의</small></div>
+  <div class="doc"><h1>견 적 서</h1>
+    <table>
+      <tr><td>견적번호</td><td class="v num">${esc(D.no)}</td></tr>
+      <tr><td>작성일</td><td class="v num">${esc(D.date)}</td></tr>
+      <tr><td>유효기간</td><td class="v">작성일로부터 ${D.valid_days}일</td></tr>
+    </table></div>
+</header>
+
+<div class="parties">
+  <div class="party"><h3>수신</h3><table>
+    <tr><td>기관</td><td>${esc(D.to.org)}</td></tr>
+    <tr><td>담당</td><td>${esc(D.to.person)}</td></tr>
+    <tr><td>건명</td><td>${esc(D.to.ref)}</td></tr>
+  </table></div>
+  <div class="party"><h3>공급자</h3><table>
+    <tr><td>상호</td><td>${esc(D.from.name)}</td></tr>
+    <tr><td>대표</td><td>${esc(D.from.rep)}</td></tr>
+    <tr><td>사업자번호</td><td class="fill">${esc(D.from.biz_no)}</td></tr>
+    <tr><td>연락처</td><td>${esc(D.from.email)}<br>${esc(D.from.site)}</td></tr>
+  </table></div>
+</div>
+
+<section><h2>교육 개요</h2>
+  <table class="t">${rows(D.overview)}</table>
+  ${D.assumption ? `<p class="note">※ ${esc(D.assumption)}</p>` : ""}
+</section>
+
+<section><h2>견적 내역 <span>부가세 별도</span></h2>
+  <table class="t">
+    <tr><th style="width:52%">항목</th><th class="c">수량</th><th class="r">단가</th><th class="r">금액</th></tr>
+    ${D.items.map(it => `<tr>
+      <td>${esc(it.name)}${it.note ? `<span class="sub">${esc(it.note)}</span>` : ""}</td>
+      <td class="c num">${it.qty}</td>
+      <td class="r num">${won(it.unit)}</td>
+      <td class="r num">${won(it.qty * it.unit)}</td></tr>`).join("")}
+    <tr class="sup"><td colspan="3" class="r">공급가액</td><td class="r num">${won(supply)}</td></tr>
+    <tr class="vat"><td colspan="3" class="r">부가세 (10%)</td><td class="r num">${won(vat)}</td></tr>
+    <tr class="total"><td colspan="3" class="r">합계</td><td class="r num">${won(supply + vat)}</td></tr>
+  </table>
+</section>
+
+<section><h2>구성을 바꾸실 때 <span>같은 내용, 형태·시간만 다르게</span></h2>
+  <table class="t">
+    <tr><th>구성</th><th>시간</th><th class="r">단가 (부가세 별도)</th><th>비고</th></tr>
+    ${D.price_list.map(p => `<tr><td>${esc(p.name)}</td><td>${esc(p.hours)}</td><td class="r num">${won(p.price)}</td><td class="sub" style="display:table-cell">${esc(p.note||"")}</td></tr>`).join("")}
+  </table>
+  <p class="note">추가 선택: ${D.options.map(o => `${esc(o.name)} +${won(o.price)}`).join(" · ")}</p>
+</section>
+
+<section><h2>맞춤형 온라인 교육 제안 <span>지역과 인원에 매이지 않는 구성</span></h2>
+  <div class="online">
+    <div>
+      <p>${esc(D.online.lead)}</p>
+      <ul>${D.online.points.map(p => `<li>${esc(p)}</li>`).join("")}</ul>
+    </div>
+    <div class="steps">
+      ${D.online.steps.map(s => `<div><b>${esc(s[0])}</b><span>${esc(s[1])}</span></div>`).join("")}
+    </div>
+  </div>
+</section>
+
+<section><h2>제안 커리큘럼 <span>${esc(D.curriculum_note)}</span></h2>
+  <table class="t">
+    <tr><th style="width:96px">시간</th><th>내용</th><th style="width:88px">방식</th></tr>
+    ${D.curriculum.map(c => `<tr><td class="num">${esc(c[0])}</td><td>${esc(c[1])}</td><td>${esc(c[2])}</td></tr>`).join("")}
+  </table>
+</section>
+
+<section><h2>포함 · 별도</h2>
+  <div class="two">
+    <div><b>포함</b><ul>${D.included.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
+    <div><b>별도</b><ul>${D.excluded.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
+  </div>
+</section>
+
+<section><h2>진행 조건</h2>
+  <ol>${D.terms.map(t => `<li>${esc(t)}</li>`).join("")}</ol>
+</section>
+
+<section><h2>강사</h2>
+  <div class="who">
+    <div>
+      <p><b>${esc(D.who.name)}</b> — ${esc(D.who.bio)}</p>
+      <ul>${D.who.facts.map(f => `<li>${esc(f)}</li>`).join("")}</ul>
+      <div class="proof">
+        ${D.who.proof.map(p => `<div><b class="num">${esc(p[0])}</b><span>${esc(p[1])}</span></div>`).join("")}
+      </div>
+      <div class="links">${D.who.links.map(l => `<div>${esc(l[0])} · <a href="${esc(l[1])}">${esc(l[1])}</a></div>`).join("")}</div>
+    </div>
+    <div class="qr">${D.qr ? `<img src="${D.qr}" alt="무료 강의 QR">` : ""}무료 강의 8편<br>바로 보기</div>
+  </div>
+</section>
+
+<div class="sign">
+  <div>${esc(D.date)} · 위와 같이 견적합니다.</div>
+  <div><b>${esc(D.from.name)}</b> · ${esc(D.from.rep)}</div>
+</div>
+`;
+document.getElementById("root").outerHTML = h;
+document.title = "ready";
+</script>
+</body></html>

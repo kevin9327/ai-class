@@ -21,7 +21,7 @@
 </style></head>
 <body><div id="root"></div>
 <script>
-const D = JSON.parse(decodeURIComponent(new URLSearchParams(location.search).get("d")));
+const D = JSON.parse(new URLSearchParams(location.search).get("d"));
 
 /* 실제 강의 장면을 찍은 사진이 아니라, 과정 내용을 나타내는 도식이다. */
 const ART = {
