@@ -8,7 +8,8 @@
    PAY_LINKS       플랜별 결제 링크(페이앱 블로그페이 주문서 URL 등). PAYAPP_USERID가 비어 있을 때 새 창으로 엽니다.
                    키 = "강의-플랜": (vibe-coding|automation|ai-content) × (pack4|single|group)
    KAKAOPAY_LINK   카카오페이 앱 '코드로 송금받기' 링크(https://qr.kakaopay.com/…). 위 둘이 없을 때 송금 폴백(수수료 0).
-   SUPABASE_URL/ANON_KEY, TOSS_CLIENT_KEY  사업자 등록 뒤 토스페이먼츠로 옮길 때(회원·주문 내역·자동 승인) */
+   FIREBASE        Firebase 콘솔 → 프로젝트 설정 → 웹 앱의 firebaseConfig 값. 채우면 회원가입·로그인·내 강의·운영자 페이지가 켜진다.
+                   Spark(무료) 플랜: 카드 없음, 무활동 정지 없음, 한도(하루 읽기 5만·쓰기 2만) 넘으면 과금이 아니라 그냥 멈춤. */
 window.SITE_CONFIG = {
   FREE_PERIOD: true,
   FREE_PERIOD_NOTE: "지금은 무료 기간입니다. 결제 없이 아래 신청만 남겨주시면 24시간 안에 연락드립니다.",
@@ -20,8 +21,6 @@ window.SITE_CONFIG = {
     "ai-content-pack4": "",  "ai-content-single": "",  "ai-content-group": ""
   },
   KAKAOPAY_LINK: "",
-  SUPABASE_URL: "",
-  SUPABASE_ANON_KEY: "",
-  TOSS_CLIENT_KEY: "",
+  FIREBASE: { apiKey: "", authDomain: "", projectId: "", appId: "" },
   CONTACT_EMAIL: "petaflo.com@gmail.com"
 };

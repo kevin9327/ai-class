@@ -18,10 +18,33 @@
     group: { name: "소그룹 3~5인 · 1인 2시간", amount: 89000 }
   };
 
-  var sb = null;
-  if (cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY && window.supabase) {
-    sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+  /* ── 회원·DB: Firebase (Spark 무료 플랜 — 카드 없음·정지 없음·과금 불가) ─────
+     config.FIREBASE(apiKey·authDomain·projectId·appId)가 채워지고 SDK가 로드되면 켜진다.
+     Firestore: users/{uid} · enrollments/{uid_planCode} · settings/site(freePeriod, admins[]) */
+  var fb = null;
+  if (cfg.FIREBASE && cfg.FIREBASE.apiKey && window.firebase) {
+    if (!window.firebase.apps.length) window.firebase.initializeApp(cfg.FIREBASE);
+    fb = { auth: window.firebase.auth(), db: window.firebase.firestore ? window.firebase.firestore() : null };
   }
+  /* 현재 로그인 사용자 — 세션 복원이 끝난 뒤 한 번 resolve (없으면 null) */
+  function currentUser() {
+    return new Promise(function (resolve) {
+      if (!fb) { resolve(null); return; }
+      var off = fb.auth.onAuthStateChanged(function (u) { off(); resolve(u); });
+    });
+  }
+  var AUTH_MSG = {
+    "auth/email-already-in-use": "이미 가입된 이메일입니다. 로그인 탭에서 로그인해주세요.",
+    "auth/invalid-email": "이메일 형식을 확인해주세요.",
+    "auth/weak-password": "비밀번호는 8자 이상으로 해주세요.",
+    "auth/invalid-credential": "이메일 또는 비밀번호가 맞지 않습니다.",
+    "auth/wrong-password": "이메일 또는 비밀번호가 맞지 않습니다.",
+    "auth/user-not-found": "가입되지 않은 이메일입니다. 회원가입 탭에서 가입해주세요.",
+    "auth/too-many-requests": "시도가 너무 많습니다. 잠시 후 다시 해주세요.",
+    "auth/network-request-failed": "네트워크 오류입니다. 연결을 확인해주세요."
+  };
+  function authMsg(e) { return (e && AUTH_MSG[e.code]) || (e && e.message) || "오류가 발생했습니다."; }
+  function tsMs(ts) { return ts && ts.toMillis ? ts.toMillis() : 0; }
 
   /* 사이트 루트 절대경로 (예: /ai-class/) — 결제 리다이렉트 URL 계산용 */
   function siteRoot() {
@@ -42,19 +65,18 @@
     var el = document.getElementById("nav-auth");
     if (!el) return;
 
-    if (!sb) {
+    if (!fb) {
       el.innerHTML = '<a class="btn btn-ghost" href="' + REL + 'index.html#contact">수강 문의</a>';
       return;
     }
 
-    sb.auth.getUser().then(function (res) {
-      var user = res.data && res.data.user;
+    currentUser().then(function (user) {
       if (user) {
         el.innerHTML =
           '<a href="' + REL + 'my.html">내 강의</a>' +
           '<button class="btn btn-ghost" id="logout-btn" type="button">로그아웃</button>';
         document.getElementById("logout-btn").addEventListener("click", function () {
-          sb.auth.signOut().then(function () { location.href = REL + "index.html"; });
+          fb.auth.signOut().then(function () { location.href = REL + "index.html"; });
         });
       } else {
         el.innerHTML =
@@ -176,17 +198,17 @@
     if (!box) { location.href = REL + "index.html#contact"; return; }
     applyFreeForm(box);
     var note = cfg.FREE_PERIOD_NOTE || "지금은 무료 기간입니다. 결제 없이 아래 신청만 남겨주세요.";
+    var code = planCode(courseId, planKey);
 
-    /* 회원 시스템(Supabase) 없이: 신청 폼만 */
-    if (!sb) {
+    /* 회원 시스템 없이: 신청 폼만 */
+    if (!fb || !fb.db) {
       payStatus(note, "ok");
       showAfterPay(courseId, planKey, "무료 기간 (0원)");
       return;
     }
 
-    /* 회원 시스템 있음: 로그인 계정에 신청을 기록하고(내 강의에 표시) 일정 폼을 펼친다 */
-    sb.auth.getUser().then(function (res) {
-      var user = res.data && res.data.user;
+    /* 회원 시스템 있음: 로그인 계정에 신청을 기록(내 강의에 표시)하고 일정 폼을 펼친다 */
+    currentUser().then(function (user) {
       if (!user) {
         payStatus("무료 기간입니다. 로그인하면(회원가입 10초) 신청이 계정에 기록됩니다. 잠시 후 로그인 화면으로 이동합니다.", "ok");
         setTimeout(function () {
@@ -195,14 +217,21 @@
         return;
       }
       payStatus("신청을 계정에 기록하는 중입니다…");
-      sb.rpc("enroll_free", { p_course_id: courseId, p_plan_code: planCode(courseId, planKey) }).then(function (r) {
-        if (r.error) { payStatus("신청 기록에 실패했습니다: " + r.error.message, "error"); return; }
-        var row = (r.data && r.data[0]) || {};
-        payStatus(row.already ? "이미 신청된 구성입니다. 아래에 가능한 일정만 남겨주세요." : note, "ok");
-        var name = (user.user_metadata && user.user_metadata.name) || "";
-        showAfterPay(courseId, planKey,
-          "무료 기간 (0원) · 계정 " + user.email + (row.out_order_id ? " · " + row.out_order_id : ""),
-          { name: name, email: user.email });
+      var name = user.displayName || "";
+      var ref = fb.db.collection("enrollments").doc(user.uid + "_" + code);
+      ref.get().then(function (snap) {
+        if (snap.exists) return true;
+        return ref.set({
+          uid: user.uid, email: user.email || "", name: name,
+          courseId: courseId, planCode: code, amount: 0, status: "free",
+          createdAt: window.firebase.firestore.FieldValue.serverTimestamp()
+        }).then(function () { return false; });
+      }).then(function (already) {
+        payStatus(already ? "이미 신청된 구성입니다. 아래에 가능한 일정만 남겨주세요." : note, "ok");
+        showAfterPay(courseId, planKey, "무료 기간 (0원) · 계정 " + (user.email || user.uid), { name: name, email: user.email });
+      }).catch(function (e) {
+        payStatus("신청 기록에 실패했습니다: " +
+          (e && e.code === "permission-denied" ? "무료 기간이 끝났거나 권한이 없습니다." : (e && e.message)), "error");
       });
     });
   }
@@ -231,9 +260,9 @@
     var note = document.querySelector(".course-grid + p.status");
     if (note) note.innerHTML = "<b>지금은 무료 기간입니다.</b> 1:1 4회 · 단회 · 소그룹 모두 결제 없이 신청만 남기시면 됩니다. 상세 페이지에서 구성을 고르세요.";
     applyFreeForm(document.getElementById("after-pay"));
-    if (sb && location.hash === "#plans" && document.getElementById("pay-status")) {
-      sb.auth.getUser().then(function (res) {
-        if (res.data && res.data.user) payStatus("로그인되었습니다. 원하는 구성의 「무료로 신청」을 눌러주세요.", "ok");
+    if (fb && location.hash === "#plans" && document.getElementById("pay-status")) {
+      currentUser().then(function (u) {
+        if (u) payStatus("로그인되었습니다. 원하는 구성의 「무료로 신청」을 눌러주세요.", "ok");
       });
     }
     var ps = document.getElementById("pay-status"), rn = ps && ps.nextElementSibling;
@@ -262,57 +291,13 @@
     setTimeout(function () { location.href = REL + "index.html#contact"; }, 1800);
   }
 
-  /* ── 수강신청(결제) ─────────────────────────── */
+  /* ── 수강신청 ─────────────────────────────────
+     무료 기간이면 계정에 기록(freeEnroll), 아니면 결제 체인(fallbackPay). */
   function enroll(courseId, planKey) {
-    var course = COURSES[courseId];
-    var plan = PLANS[planKey];
+    var course = COURSES[courseId], plan = PLANS[planKey];
     if (!course || !plan) return;
-
     if (cfg.FREE_PERIOD) { freeEnroll(courseId, planKey); return; }
-    if (!sb) { fallbackPay(courseId, planKey); return; }
-
-    sb.auth.getUser().then(function (res) {
-      var user = res.data && res.data.user;
-      if (!user) {
-        var next = location.pathname + "#plans";
-        location.href = REL + "login.html?next=" + encodeURIComponent(next);
-        return;
-      }
-
-      var orderId = "AIC" + Date.now() + Math.random().toString(36).slice(2, 8).toUpperCase();
-      var row = {
-        order_id: orderId,
-        user_id: user.id,
-        course_id: courseId,
-        plan_code: courseId + "-" + planKey,
-        amount: plan.amount,
-        status: "pending"
-      };
-
-      sb.from("orders").insert(row).then(function (r) {
-        if (r.error) {
-          payStatus("주문 생성에 실패했습니다: " + r.error.message, "error");
-          return;
-        }
-
-        if (cfg.TOSS_CLIENT_KEY && window.TossPayments) {
-          window.TossPayments(cfg.TOSS_CLIENT_KEY).requestPayment("카드", {
-            amount: plan.amount,
-            orderId: orderId,
-            orderName: course.title + " — " + plan.name,
-            customerEmail: user.email,
-            successUrl: location.origin + siteRoot() + "pay/success.html",
-            failUrl: location.origin + siteRoot() + "pay/fail.html"
-          }).catch(function (e) {
-            if (e && e.code !== "USER_CANCEL") {
-              payStatus("결제창을 열지 못했습니다: " + (e.message || e.code), "error");
-            }
-          });
-        } else {
-          fallbackPay(courseId, planKey);
-        }
-      });
-    });
+    fallbackPay(courseId, planKey);
   }
 
   /* 수강신청 버튼 배선: <button data-enroll data-course="..." data-plan-key="..."> */
@@ -360,7 +345,7 @@
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      if (!sb) {
+      if (!fb) {
         statusEl.textContent = "회원 시스템 오픈을 준비하고 있습니다. 조금만 기다려주세요.";
         return;
       }
@@ -368,123 +353,138 @@
       var pw = document.getElementById("auth-password").value;
       statusEl.removeAttribute("data-kind");
       statusEl.textContent = "처리 중입니다…";
+      submitBtn.disabled = true;
 
+      var p;
       if (mode === "signup") {
         var name = document.getElementById("auth-name").value.trim();
-        sb.auth.signUp({ email: email, password: pw, options: { data: { name: name } } })
-          .then(function (r) {
-            if (r.error) { statusEl.setAttribute("data-kind", "error"); statusEl.textContent = r.error.message; return; }
-            if (r.data && r.data.session) { afterLogin(); }
-            else { statusEl.setAttribute("data-kind", "ok"); statusEl.textContent = "가입 확인 메일을 보냈습니다. 메일함을 확인해주세요."; }
-          });
+        p = fb.auth.createUserWithEmailAndPassword(email, pw).then(function (cred) {
+          var u = cred.user;
+          var tasks = [u.updateProfile({ displayName: name })];
+          if (fb.db) {
+            tasks.push(fb.db.collection("users").doc(u.uid).set({
+              name: name, email: u.email || email,
+              createdAt: window.firebase.firestore.FieldValue.serverTimestamp()
+            }));
+          }
+          return Promise.all(tasks);
+        });
       } else {
-        sb.auth.signInWithPassword({ email: email, password: pw })
-          .then(function (r) {
-            if (r.error) { statusEl.setAttribute("data-kind", "error"); statusEl.textContent = "로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요."; return; }
-            afterLogin();
-          });
+        p = fb.auth.signInWithEmailAndPassword(email, pw);
       }
+      p.then(afterLogin).catch(function (err) {
+        submitBtn.disabled = false;
+        statusEl.setAttribute("data-kind", "error");
+        statusEl.textContent = authMsg(err);
+      });
     });
   }
 
-  /* ── 내 강의 페이지 ─────────────────────────── */
-  function esc(s) {
-    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-    });
-  }
-
+  /* ── 내 강의 (my.html) ─────────────────────────── */
   function initMyPage() {
     var listEl = document.getElementById("my-list");
     if (!listEl) return;
 
-    if (!sb) {
+    if (!fb || !fb.db) {
       listEl.innerHTML = '<p class="empty">회원 시스템 오픈을 준비하고 있습니다.</p>';
       return;
     }
 
-    sb.auth.getUser().then(function (res) {
-      var user = res.data && res.data.user;
+    currentUser().then(function (user) {
       if (!user) {
         location.href = REL + "login.html?next=" + encodeURIComponent(location.pathname);
         return;
       }
+      /* where + orderBy는 복합 색인이 필요하므로 정렬은 클라이언트에서 */
+      fb.db.collection("enrollments").where("uid", "==", user.uid).get().then(function (qs) {
+        var rows = []; qs.forEach(function (d) { rows.push(d.data()); });
+        rows.sort(function (x, y) { return tsMs(y.createdAt) - tsMs(x.createdAt); });
+        if (!rows.length) {
+          listEl.innerHTML = '<p class="empty">아직 신청 내역이 없습니다.<br/>강의 페이지에서 「무료로 신청」을 누르면 여기에 기록됩니다.</p>';
+          return;
+        }
+        listEl.innerHTML = rows.map(renderRow).join("");
+      }).catch(function (e) {
+        listEl.innerHTML = '<p class="empty">내역을 불러오지 못했습니다. (' + esc(e.message) + ')</p>';
+      });
+    });
+  }
 
-      sb.from("orders")
-        .select("order_id, course_id, plan_code, amount, status, created_at")
-        .order("created_at", { ascending: false })
-        .then(function (r) {
-          if (r.error) { listEl.innerHTML = '<p class="empty">내역을 불러오지 못했습니다.</p>'; return; }
-          var rows = r.data || [];
-          if (!rows.length) {
-            listEl.innerHTML = '<p class="empty">아직 신청 내역이 없습니다.<br/>강의 페이지에서 「무료로 신청」을 누르면 여기에 기록됩니다.</p>';
-            return;
-          }
-          listEl.innerHTML = rows.map(function (o) {
-            var course = COURSES[o.course_id] || { title: o.course_id };
-            var planKey = o.plan_code.replace(o.course_id + "-", "");
-            var plan = PLANS[planKey] || { name: o.plan_code };
-            var pill = o.status === "paid"
-              ? '<span class="pill ok">결제 완료</span>'
-              : o.status === "free"
-                ? '<span class="pill ok">무료 기간 신청</span>'
-                : o.status === "pending"
-                  ? '<span class="pill pending">결제 대기</span>'
-                  : '<span class="pill bad">실패</span>';
-            var amountText = o.status === "free" ? "무료" : Number(o.amount).toLocaleString("ko-KR") + "원";
-            var date = new Date(o.created_at).toLocaleDateString("ko-KR");
-            return '<div class="order-item"><div class="meta"><b>' + esc(course.title) + "</b><span>" +
-              esc(plan.name) + " · " + amountText + " · " + date +
-              "</span></div>" + pill + "</div>";
-          }).join("");
+  function statusPill(st) {
+    return st === "paid" ? '<span class="pill ok">결제 완료</span>'
+      : st === "free" ? '<span class="pill ok">무료 기간 신청</span>'
+      : st === "done" ? '<span class="pill ok">수강 완료</span>'
+      : st === "pending" ? '<span class="pill pending">결제 대기</span>'
+      : '<span class="pill bad">' + esc(st || "") + '</span>';
+  }
+  function rowLabels(o) {
+    var course = COURSES[o.courseId] || { title: o.courseId };
+    var planKey = String(o.planCode || "").replace(o.courseId + "-", "");
+    var plan = PLANS[planKey] || { name: o.planCode };
+    return { course: course.title, plan: plan.name };
+  }
+  function renderRow(o) {
+    var l = rowLabels(o);
+    var amountText = o.status === "free" ? "무료" : Number(o.amount || 0).toLocaleString("ko-KR") + "원";
+    var date = tsMs(o.createdAt) ? new Date(tsMs(o.createdAt)).toLocaleDateString("ko-KR") : "";
+    return '<div class="order-item"><div class="meta"><b>' + esc(l.course) + "</b><span>" +
+      esc(l.plan) + " · " + amountText + " · " + date + "</span></div>" + statusPill(o.status) + "</div>";
+  }
+
+  /* ── 운영자 페이지 (admin.html) — settings/site.admins 에 uid 가 있는 계정만 ── */
+  function initAdminPage() {
+    var root = document.getElementById("admin-root");
+    if (!root) return;
+    if (!fb || !fb.db) { root.innerHTML = '<p class="empty">회원 시스템이 아직 연결되지 않았습니다.</p>'; return; }
+
+    currentUser().then(function (user) {
+      if (!user) {
+        location.href = REL + "login.html?next=" + encodeURIComponent(location.pathname);
+        return;
+      }
+      fb.db.collection("settings").doc("site").get().then(function (snap) {
+        var admins = (snap.exists && snap.data().admins) || [];
+        if (admins.indexOf(user.uid) === -1) {
+          root.innerHTML = '<p class="empty">운영자 권한이 없는 계정입니다.<br/><small>내 UID: <code>' + esc(user.uid) +
+            '</code> — Firestore의 settings/site 문서 admins 배열에 이 값을 넣으면 열립니다.</small></p>';
+          return;
+        }
+        return fb.db.collection("enrollments").orderBy("createdAt", "desc").limit(500).get().then(function (qs) {
+          var rows = []; qs.forEach(function (d) { rows.push(d.data()); });
+          renderAdmin(root, rows);
         });
+      }).catch(function (e) {
+        root.innerHTML = '<p class="empty">불러오지 못했습니다: ' + esc(e.message) + '</p>';
+      });
     });
   }
+  function renderAdmin(root, rows) {
+    var body = rows.map(function (o) {
+      var l = rowLabels(o);
+      var ms = tsMs(o.createdAt);
+      var when = ms ? new Date(ms).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" }) : "";
+      return "<tr><td>" + esc(when) + "</td><td>" + esc(o.email || "") + "</td><td>" + esc(o.name || "") +
+        "</td><td>" + esc(l.course) + "</td><td>" + esc(l.plan) + "</td><td>" + statusPill(o.status) + "</td></tr>";
+    }).join("");
+    var csvRows = [["일시", "이메일", "이름", "강의", "구성", "상태"]].concat(rows.map(function (o) {
+      var l = rowLabels(o), ms = tsMs(o.createdAt);
+      return [ms ? new Date(ms).toISOString() : "", o.email || "", o.name || "", l.course, l.plan, o.status || ""];
+    }));
+    var csv = csvRows.map(function (r) {
+      return r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(",");
+    }).join("\r\n");
+    var blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
 
-  /* ── 결제 성공 페이지 ───────────────────────── */
-  function initSuccessPage() {
-    var box = document.getElementById("confirm-result");
-    if (!box) return;
-
-    var p = new URLSearchParams(location.search);
-    var paymentKey = p.get("paymentKey");
-    var orderId = p.get("orderId");
-    var amount = Number(p.get("amount"));
-
-    function fail(msg) {
-      box.innerHTML = '<div class="icon">⚠️</div><h1>결제 확인에 실패했습니다</h1><p>' + esc(msg) +
-        '<br/>결제가 이중으로 청구되지는 않습니다. 문의를 남겨주시면 바로 확인해 드립니다.</p>' +
-        '<a class="btn btn-primary" href="' + REL + 'index.html#contact">문의하기</a>';
-    }
-
-    if (!paymentKey || !orderId || !amount) { fail("결제 정보가 올바르지 않습니다."); return; }
-    if (!sb) { fail("시스템 설정이 완료되지 않았습니다."); return; }
-
-    sb.auth.getSession().then(function (res) {
-      var session = res.data && res.data.session;
-      if (!session) { fail("로그인 세션이 만료되었습니다. 로그인 후 다시 시도해주세요."); return; }
-
-      fetch(cfg.SUPABASE_URL + "/functions/v1/confirm-payment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + session.access_token,
-          "apikey": cfg.SUPABASE_ANON_KEY
-        },
-        body: JSON.stringify({ paymentKey: paymentKey, orderId: orderId, amount: amount })
-      })
-        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, body: j }; }); })
-        .then(function (r) {
-          if (!r.ok) { fail(r.body && r.body.message || "승인 처리 중 오류가 발생했습니다."); return; }
-          box.innerHTML = '<div class="icon">🎉</div><h1>결제가 완료되었습니다</h1>' +
-            '<p>수강권이 발급되었습니다. 24시간 안에 연락드려 첫 일정을 잡겠습니다.</p>' +
-            '<a class="btn btn-primary" href="' + REL + 'my.html">내 강의 보기</a>';
-        })
-        .catch(function () { fail("네트워크 오류가 발생했습니다."); });
-    });
+    root.innerHTML =
+      '<p class="admin-summary">신청 <b>' + rows.length + '</b>건 &nbsp;' +
+      '<a class="btn btn-ghost" id="csv-dl" download="signups.csv">CSV 내려받기</a></p>' +
+      '<div class="table-wrap"><table class="admin-table"><thead><tr>' +
+      '<th>일시</th><th>이메일</th><th>이름</th><th>강의</th><th>구성</th><th>상태</th></tr></thead><tbody>' +
+      (body || '<tr><td colspan="6" class="empty">아직 신청이 없습니다.</td></tr>') + "</tbody></table></div>";
+    document.getElementById("csv-dl").href = URL.createObjectURL(blob);
   }
 
-  /* ── 문의 폼 (FormSubmit) ───────────────────── */
+  /* ── 문의 폼 ─────────────────────────────────── */
   function initInquiryForm() {
     var form = document.getElementById("inquiry");
     if (!form) return;
@@ -761,7 +761,7 @@
     preloadPayApp();
     initAuthPage();
     initMyPage();
-    initSuccessPage();
+    initAdminPage();
     initInquiryForm();
     initLessons();
     initPrompts();

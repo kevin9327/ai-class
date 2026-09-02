@@ -90,3 +90,9 @@ TOSS_CLIENT_KEY 미설정이면 신청이 토스아이디 송금 링크(금액 �
 - 결제창은 클릭 핸들러 안에서 동기로 연다(팝업 차단 회피). 그래서 `payapp-lite.js`는 페이지 로드 때 preload.
 - `returnurl`은 쓰지 않는다 — GitHub Pages가 POST를 못 받는다(`skip_cstpage=y`면 POST 이동).
 - 결제 뒤 이행은 강의 페이지의 `#after-pay`(FormSubmit, 구분="결제 완료 일정 요청")로 받는다. 페이앱 판매자 알림 + 이 메일 두 개로 확인.
+
+## 2026-09-03 변경 — 회원·DB를 Supabase → Firebase Spark 로 교체
+
+이유: "무료를 오래". Supabase 무료는 7일 무활동 정지(keepalive 필요)·프로젝트 2개 제한·넘으면 $25/월부터.
+Firebase Spark는 카드 없음·정지 없음·한도 초과 시 과금 대신 중단이라 이 규모에서 사실상 영구 무료.
+`supabase/`·`pay/`·keepalive 워크플로 삭제, `firebase/firestore.rules`·`admin.html` 추가. 상세는 `firebase/README.md`.
