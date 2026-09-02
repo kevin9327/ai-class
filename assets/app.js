@@ -93,7 +93,7 @@
     }
     set("강의", course.title + " — " + plan.name + " (" + won(plan.amount) + ")");
     set("결제수단", method);
-    if (buyer) { set("이름", buyer.name); set("연락처", buyer.phone); }
+    if (buyer) { set("이름", buyer.name); set("연락처", buyer.phone); set("이메일", buyer.email); }
     box.hidden = false;
     box.scrollIntoView({ behavior: "smooth", block: "start" });
   }
@@ -175,8 +175,36 @@
     var box = document.getElementById("after-pay");
     if (!box) { location.href = REL + "index.html#contact"; return; }
     applyFreeForm(box);
-    payStatus(cfg.FREE_PERIOD_NOTE || "지금은 무료 기간입니다. 결제 없이 아래 신청만 남겨주세요.", "ok");
-    showAfterPay(courseId, planKey, "무료 기간 (0원)");
+    var note = cfg.FREE_PERIOD_NOTE || "지금은 무료 기간입니다. 결제 없이 아래 신청만 남겨주세요.";
+
+    /* 회원 시스템(Supabase) 없이: 신청 폼만 */
+    if (!sb) {
+      payStatus(note, "ok");
+      showAfterPay(courseId, planKey, "무료 기간 (0원)");
+      return;
+    }
+
+    /* 회원 시스템 있음: 로그인 계정에 신청을 기록하고(내 강의에 표시) 일정 폼을 펼친다 */
+    sb.auth.getUser().then(function (res) {
+      var user = res.data && res.data.user;
+      if (!user) {
+        payStatus("무료 기간입니다. 로그인하면(회원가입 10초) 신청이 계정에 기록됩니다. 잠시 후 로그인 화면으로 이동합니다.", "ok");
+        setTimeout(function () {
+          location.href = REL + "login.html?next=" + encodeURIComponent(location.pathname + "#plans");
+        }, 1200);
+        return;
+      }
+      payStatus("신청을 계정에 기록하는 중입니다…");
+      sb.rpc("enroll_free", { p_course_id: courseId, p_plan_code: planCode(courseId, planKey) }).then(function (r) {
+        if (r.error) { payStatus("신청 기록에 실패했습니다: " + r.error.message, "error"); return; }
+        var row = (r.data && r.data[0]) || {};
+        payStatus(row.already ? "이미 신청된 구성입니다. 아래에 가능한 일정만 남겨주세요." : note, "ok");
+        var name = (user.user_metadata && user.user_metadata.name) || "";
+        showAfterPay(courseId, planKey,
+          "무료 기간 (0원) · 계정 " + user.email + (row.out_order_id ? " · " + row.out_order_id : ""),
+          { name: name, email: user.email });
+      });
+    });
   }
 
   function initFreePeriod() {
@@ -203,6 +231,11 @@
     var note = document.querySelector(".course-grid + p.status");
     if (note) note.innerHTML = "<b>지금은 무료 기간입니다.</b> 1:1 4회 · 단회 · 소그룹 모두 결제 없이 신청만 남기시면 됩니다. 상세 페이지에서 구성을 고르세요.";
     applyFreeForm(document.getElementById("after-pay"));
+    if (sb && location.hash === "#plans" && document.getElementById("pay-status")) {
+      sb.auth.getUser().then(function (res) {
+        if (res.data && res.data.user) payStatus("로그인되었습니다. 원하는 구성의 「무료로 신청」을 눌러주세요.", "ok");
+      });
+    }
     var ps = document.getElementById("pay-status"), rn = ps && ps.nextElementSibling;
     if (rn && rn.classList.contains("notice")) rn.hidden = true; // free mode: refund notice is moot
   }
@@ -384,7 +417,7 @@
           if (r.error) { listEl.innerHTML = '<p class="empty">내역을 불러오지 못했습니다.</p>'; return; }
           var rows = r.data || [];
           if (!rows.length) {
-            listEl.innerHTML = '<p class="empty">아직 수강 내역이 없습니다.<br/>송금으로 결제하신 경우, 확인 후 이곳에 표시됩니다.</p>';
+            listEl.innerHTML = '<p class="empty">아직 신청 내역이 없습니다.<br/>강의 페이지에서 「무료로 신청」을 누르면 여기에 기록됩니다.</p>';
             return;
           }
           listEl.innerHTML = rows.map(function (o) {
@@ -393,12 +426,15 @@
             var plan = PLANS[planKey] || { name: o.plan_code };
             var pill = o.status === "paid"
               ? '<span class="pill ok">결제 완료</span>'
-              : o.status === "pending"
-                ? '<span class="pill pending">결제 대기</span>'
-                : '<span class="pill bad">실패</span>';
+              : o.status === "free"
+                ? '<span class="pill ok">무료 기간 신청</span>'
+                : o.status === "pending"
+                  ? '<span class="pill pending">결제 대기</span>'
+                  : '<span class="pill bad">실패</span>';
+            var amountText = o.status === "free" ? "무료" : Number(o.amount).toLocaleString("ko-KR") + "원";
             var date = new Date(o.created_at).toLocaleDateString("ko-KR");
             return '<div class="order-item"><div class="meta"><b>' + esc(course.title) + "</b><span>" +
-              esc(plan.name) + " · " + Number(o.amount).toLocaleString("ko-KR") + "원 · " + date +
+              esc(plan.name) + " · " + amountText + " · " + date +
               "</span></div>" + pill + "</div>";
           }).join("");
         });
