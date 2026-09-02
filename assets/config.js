@@ -21,6 +21,11 @@ window.SITE_CONFIG = {
     "ai-content-pack4": "",  "ai-content-single": "",  "ai-content-group": ""
   },
   KAKAOPAY_LINK: "",
-  FIREBASE: { apiKey: "", authDomain: "", projectId: "", appId: "" },
+  FIREBASE: {
+    apiKey: "AIzaSyC96XpH9q309DCxdG9Gc6nfveMdDRK1Eg8",
+    authDomain: "ai-class-7b852.firebaseapp.com",
+    projectId: "ai-class-7b852",
+    appId: "1:843390669153:web:12985d6d6e537a4b9e3520"
+  },
   CONTACT_EMAIL: "petaflo.com@gmail.com"
 };
