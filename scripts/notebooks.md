@@ -1,6 +1,6 @@
 # NotebookLM 노트북 (동영상 생성용)
 
-강의 1편 = 노트북 1개. 소스는 `scripts/lesson-N.md` 전문. 1~3강 8/31, 4~6강 9/1 생성.
+강의 1편 = 노트북 1개. 소스는 `scripts/lesson-N.md` 전문. 1~3강 8/31, 4~6강 9/1, 7~8강 9/2 생성 — **전 8편 완료**.
 
 | 강 | 노트북 | 자동 붙은 제목 |
 |---|---|---|
@@ -10,6 +10,8 @@
 | 4강 | [f2a85448](https://notebook.google.com/notebook/f2a85448-c40c-4e49-bf28-a260a2d519ba) | The Art of Transforming Meeting Transcripts into Actionable Records |
 | 5강 | [f7f7f4b5](https://notebook.google.com/notebook/f7f7f4b5-b934-432a-803b-ea1a01fa21cd) | Mastering Incremental Excel Automation Logic |
 | 6강 | [e328df1d](https://notebook.google.com/notebook/e328df1d-3fe6-41bf-a25e-15e091c5f7fe) | Secure AI Practices for Corporate Data Handling |
+| 7강 | [9a531fe8](https://notebook.google.com/notebook/9a531fe8-3eee-4cf5-84db-0c221b20bc00) | The Evolution of Action: From Chatbot to AI Agent |
+| 8강 | [3a23eb96](https://notebook.google.com/notebook/3a23eb96-e8c9-4b14-8f6d-dc08a22fe565) | The Art of Selective Delegation: When to Stop Tasking |
 
 ## 생성 설정 (전편 공통)
 
@@ -18,7 +20,8 @@
 - 시각적 스타일: **기본** (기업·기관 대상이라 담백한 쪽)
 - AI 호스트 지시문: 원고 순서·표현 유지, 원고에 없는 내용·통계·제품명 금지,
   존댓말·과장 없이. **강별로 강조점을 다르게** 넣음 — 3강은 사실 확인 단계,
-  4강은 결정/논의 구분, 5강은 넘길 일과 안 넘길 일, 6강은 넣으면 안 되는 자료.
+  4강은 결정/논의 구분, 5강은 넘길 일과 안 넘길 일, 6강은 넣으면 안 되는 자료,
+  7강은 원본 복사·중간 과정 검증, 8강은 최소 검증 절차 네 가지.
 
 ## 남은 절차
 
@@ -31,6 +34,6 @@
 
 ## 알아둘 것
 
-- 무료 한도 **하루 3편**. 1~3강은 8/31, 4~6강은 9/1에 뽑았고 **7·8강은 다음 날**.
+- 무료 한도 **하루 3편**. 8편을 사흘에 나눠 뽑았다(8/31·9/1·9/2).
 - 올리기 전에 **내용을 직접 확인**할 것. AI 생성물이라 수치·고유명사가 틀릴 수 있음.
 - **워터마크 확인됨**: 우측 하단에 「Gemini Notebook」 표기가 찍힘. 무료 강의라 그대로 씀.
