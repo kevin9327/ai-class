@@ -203,6 +203,8 @@
     var note = document.querySelector(".course-grid + p.status");
     if (note) note.innerHTML = "<b>지금은 무료 기간입니다.</b> 1:1 4회 · 단회 · 소그룹 모두 결제 없이 신청만 남기시면 됩니다. 상세 페이지에서 구성을 고르세요.";
     applyFreeForm(document.getElementById("after-pay"));
+    var ps = document.getElementById("pay-status"), rn = ps && ps.nextElementSibling;
+    if (rn && rn.classList.contains("notice")) rn.hidden = true; // free mode: refund notice is moot
   }
 
   function fallbackPay(courseId, planKey) {
