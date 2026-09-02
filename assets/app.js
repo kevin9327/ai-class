@@ -153,6 +153,58 @@
     payStatus("");
   }
 
+  /* ── 무료 기간 모드 (config.FREE_PERIOD) ─────────
+     결제 대신 "지금은 무료 기간입니다" 안내 후 신청 폼만 받는다. false로 바꾸면 아래 결제 체인으로 복귀. */
+  function applyFreeForm(box) {
+    if (!box || box.getAttribute("data-free") === "1") return;
+    var h = box.querySelector("h3"), lead = box.querySelector(":scope > p");
+    if (h) h.textContent = "무료 기간 신청";
+    if (lead) lead.textContent = "결제 없이 신청만 남겨주시면 24시간 안에 연락드려 첫 수업 일정을 잡습니다.";
+    function set(name, val) { var el = box.querySelector('[name="' + name + '"]'); if (el) el.value = val; }
+    set("_subject", "[실무AI클래스] 무료 기간 신청");
+    set("구분", "무료 기간 신청");
+    set("_next", "https://kevin9327.github.io/ai-class/thanks.html");
+    var nameLabel = box.querySelector('label[for="ap-name"]');
+    if (nameLabel) nameLabel.textContent = "이름";
+    var btn = box.querySelector('button[type="submit"]');
+    if (btn) btn.textContent = "무료로 신청하기";
+    box.setAttribute("data-free", "1");
+  }
+
+  function freeEnroll(courseId, planKey) {
+    var box = document.getElementById("after-pay");
+    if (!box) { location.href = REL + "index.html#contact"; return; }
+    applyFreeForm(box);
+    payStatus(cfg.FREE_PERIOD_NOTE || "지금은 무료 기간입니다. 결제 없이 아래 신청만 남겨주세요.", "ok");
+    showAfterPay(courseId, planKey, "무료 기간 (0원)");
+  }
+
+  function initFreePeriod() {
+    if (!cfg.FREE_PERIOD) return;
+    document.documentElement.setAttribute("data-free-period", "1");
+    var badge = '<span class="free-badge">무료 기간</span>';
+
+    /* 메인 강의 카드: 16% · 596,000 · 499,000원 → [무료 기간] 499,000원(취소선) 무료 */
+    Array.prototype.forEach.call(document.querySelectorAll(".price-row"), function (row) {
+      var now = row.querySelector(".now"), was = row.querySelector(".was"), sale = row.querySelector(".sale");
+      if (!now) return;
+      if (sale) { sale.outerHTML = badge; } else { row.insertAdjacentHTML("afterbegin", badge); }
+      if (was) { was.textContent = now.textContent; }
+      else { now.insertAdjacentHTML("beforebegin", '<span class="was">' + esc(now.textContent) + "</span>"); }
+      now.textContent = "무료";
+    });
+    /* 상세 페이지 플랜: <small>596,000</small>499,000원 → <small>499,000원</small>무료 [무료 기간] */
+    Array.prototype.forEach.call(document.querySelectorAll(".plan-box .amount"), function (amt) {
+      var price = "";
+      Array.prototype.forEach.call(amt.childNodes, function (n) { if (n.nodeType === 3) price += n.textContent; });
+      amt.innerHTML = "<small>" + esc(price.trim()) + "</small>무료 " + badge;
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-enroll]"), function (b) { b.textContent = "무료로 신청"; });
+    var note = document.querySelector(".course-grid + p.status");
+    if (note) note.innerHTML = "<b>지금은 무료 기간입니다.</b> 1:1 4회 · 단회 · 소그룹 모두 결제 없이 신청만 남기시면 됩니다. 상세 페이지에서 구성을 고르세요.";
+    applyFreeForm(document.getElementById("after-pay"));
+  }
+
   function fallbackPay(courseId, planKey) {
     var plan = PLANS[planKey];
     var link = (cfg.PAY_LINKS || {})[planCode(courseId, planKey)];
@@ -181,6 +233,7 @@
     var plan = PLANS[planKey];
     if (!course || !plan) return;
 
+    if (cfg.FREE_PERIOD) { freeEnroll(courseId, planKey); return; }
     if (!sb) { fallbackPay(courseId, planKey); return; }
 
     sb.auth.getUser().then(function (res) {
@@ -666,6 +719,7 @@
   document.addEventListener("DOMContentLoaded", function () {
     initHeader();
     initEnrollButtons();
+    initFreePeriod();
     preloadPayApp();
     initAuthPage();
     initMyPage();

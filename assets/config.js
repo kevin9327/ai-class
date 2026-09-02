@@ -1,4 +1,6 @@
 /* 사이트 전역 설정 — 값을 채우는 순서대로 기능이 켜집니다.
+   FREE_PERIOD     true면 모든 강의·플랜이 결제 대신 "지금은 무료 기간입니다" 안내 + 신청 폼(메일 수신)으로 진행.
+                   false로 바꾸면 아래 결제 체인으로 복귀. FREE_PERIOD_NOTE = 클릭 시 보여줄 문장.
    PAYAPP_USERID   페이앱(payapp.kr) 판매자 아이디 = 판매자센터 로그인 아이디.
                    채우면 수강신청 버튼이 카드·카카오페이·네이버페이 결제창을 엽니다.
                    사업자 없는 개인도 가입 가능(카드 4.0%, D+3 정산).
@@ -8,6 +10,8 @@
    KAKAOPAY_LINK   카카오페이 앱 '코드로 송금받기' 링크(https://qr.kakaopay.com/…). 위 둘이 없을 때 송금 폴백(수수료 0).
    SUPABASE_URL/ANON_KEY, TOSS_CLIENT_KEY  사업자 등록 뒤 토스페이먼츠로 옮길 때(회원·주문 내역·자동 승인) */
 window.SITE_CONFIG = {
+  FREE_PERIOD: true,
+  FREE_PERIOD_NOTE: "지금은 무료 기간입니다. 결제 없이 아래 신청만 남겨주시면 24시간 안에 연락드립니다.",
   PAYAPP_USERID: "",
   PAYAPP_SHOPNAME: "실무AI클래스",
   PAY_LINKS: {

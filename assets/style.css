@@ -611,3 +611,10 @@ fieldset { border: 0; padding: 0; margin: 0 0 20px; }
 .after-pay h3 { margin: 0 0 6px; font-size: 1.08rem; font-weight: 800; }
 .after-pay > p { margin: 0 0 16px; font-size: 0.9rem; color: var(--ink-2); }
 @media (max-width: 720px) { .buyer-form .buyer-grid { grid-template-columns: 1fr; } }
+
+/* ── 무료 기간 모드 (config.FREE_PERIOD) ───────────── */
+.free-badge { display: inline-block; margin-left: 6px; padding: 2px 9px; border-radius: 999px; background: var(--green); color: #fff; font-size: 0.72rem; font-weight: 800; vertical-align: middle; letter-spacing: 0; }
+.price-row .free-badge { margin-left: 0; }
+[data-free-period] .price-row .now { color: var(--green); }
+[data-free-period] .plan-box .amount { color: var(--green); }
+[data-free-period] .plan-box .amount .free-badge { margin-left: 4px; }
