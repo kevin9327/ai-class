@@ -45,6 +45,11 @@
   };
   function authMsg(e) { return (e && AUTH_MSG[e.code]) || (e && e.message) || "오류가 발생했습니다."; }
   function tsMs(ts) { return ts && ts.toMillis ? ts.toMillis() : 0; }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c];
+    });
+  }
 
   /* 사이트 루트 절대경로 (예: /ai-class/) — 결제 리다이렉트 URL 계산용 */
   function siteRoot() {
