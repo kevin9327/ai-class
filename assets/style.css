@@ -618,3 +618,10 @@ fieldset { border: 0; padding: 0; margin: 0 0 20px; }
 [data-free-period] .price-row .now { color: var(--green); }
 [data-free-period] .plan-box .amount { color: var(--green); }
 [data-free-period] .plan-box .amount .free-badge { margin-left: 4px; }
+
+/* ── 로그인: Google 버튼 · 구분선 ───────────────────────── */
+.btn-google { background: #fff; color: var(--ink); border: 1px solid var(--line); display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
+.btn-google:hover { border-color: var(--ink-3); background: #fafafa; }
+.btn-google[disabled] { opacity: .5; }
+.or-divider { display: flex; align-items: center; gap: 12px; margin: 18px 0; color: var(--ink-3); font-size: 0.82rem; }
+.or-divider::before, .or-divider::after { content: ""; flex: 1; height: 1px; background: var(--line-soft); }

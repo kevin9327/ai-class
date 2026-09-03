@@ -4,7 +4,15 @@ service cloud.firestore {
 
     function signedIn() { return request.auth != null; }
     function site() { return get(/databases/$(database)/documents/settings/site).data; }
-    function isAdmin() { return signedIn() && request.auth.uid in site().admins; }
+    // 운영자 = settings/site.admins(uid) 또는 adminEmails(인증된 이메일만; Google 로그인은 자동 인증)
+    function isAdmin() {
+      return signedIn() && (
+        request.auth.uid in site().admins ||
+        (request.auth.token.email_verified == true
+          && 'adminEmails' in site()
+          && request.auth.token.email in site().adminEmails)
+      );
+    }
     function validPlan(code) {
       return code in ['vibe-coding-pack4', 'vibe-coding-single', 'vibe-coding-group',
                       'automation-pack4',  'automation-single',  'automation-group',

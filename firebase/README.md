@@ -6,7 +6,7 @@
 ## 구성
 - Authentication: 이메일/비밀번호
 - Firestore (asia-northeast3 서울, production 모드) + `firestore.rules`
-  - `settings/site` : `{ freePeriod: true, admins: ["<운영자 uid>"] }` — 콘솔에서 직접 만든다
+  - `settings/site` : `{ freePeriod: true, admins: ["<운영자 uid>"], adminEmails: ["<운영자 이메일>"] }` — 콘솔에서 직접 만든다. adminEmails는 이메일 인증된 계정(Google 로그인)만 인정
   - `users/{uid}` : 가입 시 사이트가 만든다
   - `enrollments/{uid_planCode}` : 「무료로 신청」 클릭 시 사이트가 만든다 (같은 구성 중복 불가는 문서 id로 보장)
 - 웹 앱 firebaseConfig → `assets/config.js`의 `FIREBASE`

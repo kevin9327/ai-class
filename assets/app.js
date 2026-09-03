@@ -45,6 +45,17 @@
   };
   function authMsg(e) { return (e && AUTH_MSG[e.code]) || (e && e.message) || "오류가 발생했습니다."; }
   function tsMs(ts) { return ts && ts.toMillis ? ts.toMillis() : 0; }
+
+  /* 운영자 판정 — settings/site.admins(uid) 또는 adminEmails(이메일, 인증된 계정만). 규칙(firestore.rules)과 같은 기준. */
+  function isAdminUser(user) {
+    if (!fb || !fb.db || !user) return Promise.resolve(false);
+    return fb.db.collection("settings").doc("site").get().then(function (snap) {
+      var d = snap.exists ? snap.data() : {};
+      var byUid = (d.admins || []).indexOf(user.uid) !== -1;
+      var byEmail = !!user.emailVerified && (d.adminEmails || []).indexOf(String(user.email || "").toLowerCase()) !== -1;
+      return byUid || byEmail;
+    }).catch(function () { return false; });
+  }
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c];
@@ -348,6 +359,42 @@
       location.href = next;
     }
 
+    /* 가입 직후·Google 로그인 뒤 users/{uid} 프로필을 남긴다 (이미 있으면 덮어쓰기 — 규칙상 본인만) */
+    function ensureProfile(u, name) {
+      if (!fb.db) return Promise.resolve();
+      return fb.db.collection("users").doc(u.uid).set({
+        name: name || u.displayName || "", email: u.email || "",
+        createdAt: window.firebase.firestore.FieldValue.serverTimestamp()
+      }).catch(function () { /* 프로필 실패는 로그인 자체를 막지 않는다 */ });
+    }
+
+    /* 이미 로그인된 상태로 로그인 페이지에 오면(예: Google 리디렉션 복귀) 바로 next로 */
+    if (fb) {
+      currentUser().then(function (u) { if (u) afterLogin(); });
+    }
+
+    var gbtn = document.getElementById("google-btn");
+    if (gbtn) {
+      if (!fb) { gbtn.disabled = true; }
+      gbtn.addEventListener("click", function () {
+        if (!fb) return;
+        statusEl.removeAttribute("data-kind");
+        statusEl.textContent = "Google 창을 여는 중입니다…";
+        var provider = new window.firebase.auth.GoogleAuthProvider();
+        fb.auth.signInWithPopup(provider).then(function (cred) {
+          return ensureProfile(cred.user).then(afterLogin);
+        }).catch(function (err) {
+          if (err && (err.code === "auth/popup-blocked" || err.code === "auth/operation-not-supported-in-this-environment")) {
+            fb.auth.signInWithRedirect(provider); // 팝업이 막힌 브라우저(모바일 등)는 리디렉션으로
+            return;
+          }
+          if (err && err.code === "auth/popup-closed-by-user") { statusEl.textContent = ""; return; }
+          statusEl.setAttribute("data-kind", "error");
+          statusEl.textContent = authMsg(err);
+        });
+      });
+    }
+
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       if (!fb) {
@@ -412,6 +459,11 @@
       }).catch(function (e) {
         listEl.innerHTML = '<p class="empty">내역을 불러오지 못했습니다. (' + esc(e.message) + ')</p>';
       });
+      isAdminUser(user).then(function (ok) {
+        if (!ok) return;
+        listEl.insertAdjacentHTML("afterend",
+          '<p class="status" style="margin-top:22px;">운영자 계정입니다 · <a href="' + REL + 'admin.html" style="color:var(--brand);font-weight:700;">신청 현황 보기</a></p>');
+      });
     });
   }
 
@@ -447,11 +499,11 @@
         location.href = REL + "login.html?next=" + encodeURIComponent(location.pathname);
         return;
       }
-      fb.db.collection("settings").doc("site").get().then(function (snap) {
-        var admins = (snap.exists && snap.data().admins) || [];
-        if (admins.indexOf(user.uid) === -1) {
-          root.innerHTML = '<p class="empty">운영자 권한이 없는 계정입니다.<br/><small>내 UID: <code>' + esc(user.uid) +
-            '</code> — Firestore의 settings/site 문서 admins 배열에 이 값을 넣으면 열립니다.</small></p>';
+      isAdminUser(user).then(function (ok) {
+        if (!ok) {
+          root.innerHTML = '<p class="empty">운영자 권한이 없는 계정입니다.<br/><small>로그인 계정: ' + esc(user.email || "") +
+            (user.email && !user.emailVerified ? " (이메일 미인증 — Google 계정으로 로그인하면 바로 인증됩니다)" : "") +
+            '<br/>내 UID: <code>' + esc(user.uid) + '</code></small></p>';
           return;
         }
         return fb.db.collection("enrollments").orderBy("createdAt", "desc").limit(500).get().then(function (qs) {
