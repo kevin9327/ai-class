@@ -385,7 +385,9 @@
           return ensureProfile(cred.user).then(afterLogin);
         }).catch(function (err) {
           if (err && (err.code === "auth/popup-blocked" || err.code === "auth/operation-not-supported-in-this-environment")) {
-            fb.auth.signInWithRedirect(provider); // 팝업이 막힌 브라우저(모바일 등)는 리디렉션으로
+            // signInWithRedirect는 사이트 도메인(github.io)≠authDomain(firebaseapp.com)이라 Chrome에서 결과를 못 돌려받음(0903 실측) → 안내만
+            statusEl.setAttribute("data-kind", "error");
+            statusEl.textContent = "브라우저가 로그인 창(팝업)을 막았습니다. 주소창의 팝업 차단 아이콘에서 허용한 뒤 다시 눌러주세요.";
             return;
           }
           if (err && err.code === "auth/popup-closed-by-user") { statusEl.textContent = ""; return; }
