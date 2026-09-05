@@ -20,15 +20,15 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>" />
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css" />
-<link rel="stylesheet" href="./assets/style.css?v=20260905a" />
+<link rel="stylesheet" href="./assets/style.css?v=20260905b" />
 
 <script>window.REL = "./";</script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js" defer></script>
-<script src="./assets/config.js?v=20260905a" defer></script>
-<script src="./assets/lessons.js?v=20260905a" defer></script>
-<script src="./assets/lessons-content.js?v=20260905a" defer></script>
-<script src="./assets/app.js?v=20260905a" defer></script>
+<script src="./assets/config.js?v=20260905b" defer></script>
+<script src="./assets/lessons.js?v=20260905b" defer></script>
+<script src="./assets/lessons-content.js?v=20260905b" defer></script>
+<script src="./assets/app.js?v=20260905b" defer></script>
 </head>
 <body>
 
@@ -43,79 +43,106 @@
       <a href="./training.html">기업 교육</a>
       <a href="./index.html#contact">문의</a>
     </nav>
+    <form class="search" role="search" action="./prompts.html" method="get" data-search>
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="search" name="q" placeholder="강의·프롬프트 검색" autocomplete="off" aria-label="강의·프롬프트 검색" />
+      <div class="search-drop" hidden></div>
+    </form>
     <div class="nav-auth" id="nav-auth"></div>
   </div>
 </header>
 
-<section class="hero compact">
+<div class="player-bar">
   <div class="wrap">
-    <p class="kicker">무료 · 가입 없이 · 전편 공개</p>
-    <h1>업무에 바로 쓰는<br />AI 실무 강의</h1>
-    <p class="sub">
-      도구를 소개하는 강의가 아니라, 실제 업무를 하나 골라 끝까지 처리하는 과정입니다.
-      전부 무료이고 로그인도 필요 없습니다. 영상 아래에 본문과 프롬프트가 그대로 있습니다.
-    </p>
-    <ul class="points">
-      <li>회원가입도 결제도 없음</li>
-      <li><span data-lesson-count>8</span>강 · 순서대로 봐도, 막힌 편만 봐도</li>
-      <li>더 필요하면 외주·기업 교육으로</li>
-    </ul>
+    <a href="./index.html">홈</a><span class="sep">›</span>
+    <a href="./lessons.html">무료 강의</a><span class="sep">›</span>
+    <span id="bar-title">전체 <span data-lesson-count>8</span>강</span>
+    <span class="tag free">무료 · 가입 불필요</span>
   </div>
-</section>
+</div>
 
-<section class="section">
-  <div class="wrap lesson-layout">
-    <aside class="toc-wrap">
-      <p class="eyebrow">목차</p>
-      <ol class="toc" id="lesson-toc"></ol>
-      <div class="toc-cta">
-        <a href="./outsourcing.html">이 작업을 대신 만들어 달라면 →</a>
-        <a href="./prompts.html">프롬프트 32개 →</a>
+<div class="wrap player-layout">
+  <main class="player-main">
+    <div class="player-video">
+      <video id="pv" controls playsinline preload="metadata"></video>
+    </div>
+    <div class="player-head">
+      <div>
+        <span class="lno" id="p-no"></span>
+        <h1 id="p-title">강의를 불러오는 중입니다</h1>
+        <div class="player-meta"><span id="p-len"></span><span>무료</span><span>회원가입 없음</span><span>영상 아래에 본문</span></div>
       </div>
-    </aside>
-
-    <div>
-      <div class="section-head">
-        <p class="eyebrow">CURRICULUM</p>
-        <h2>공개된 강의 <span data-lesson-count>8</span>강</h2>
-        <p>제목을 누르면 영상과 본문이 펼쳐집니다. 왼쪽 목차나 코스 페이지 링크로 오면 해당 편이 바로 열립니다.</p>
-      </div>
-
-      <div class="lesson-list" id="lesson-list"></div>
-
-      <div class="lesson-cta">
-        <div>
-          <h3>영상만으로 안 풀리는 지점이 있다면</h3>
-          <p>문의 폼에 「강의 질문」으로 남겨주세요. 하루 안에 답변하고, 같은 질문이 반복되면 강의에 반영합니다.</p>
-        </div>
-        <a class="btn btn-primary" href="./index.html#contact">질문 남기기</a>
-      </div>
-
-      <div class="lesson-cta">
-        <div>
-          <h3>배우는 것보다 맡기는 게 낫다면</h3>
-          <p>홈페이지·업무 자동화·앱·AI 도입을 100% 온라인으로 대신 만들어 드립니다. 견적은 무료이고, 이 강의에서 보여드리는 방식 그대로 만듭니다.</p>
-        </div>
-        <a class="btn btn-dark" href="./outsourcing.html">외주 의뢰</a>
-      </div>
-
-      <div class="lesson-cta">
-        <div>
-          <h3>팀·기관에서 단체로 교육이 필요하시면</h3>
-          <p>Zoom 라이브를 기본으로 구성해 드립니다. 인원과 형태를 주시면 1영업일 안에 견적을 회신합니다.</p>
-        </div>
-        <a class="btn btn-ghost" href="./training.html">기업 교육 안내</a>
+      <div class="player-nav">
+        <button type="button" class="btn btn-ghost" id="p-prev">‹ 이전 강</button>
+        <button type="button" class="btn btn-primary" id="p-next">다음 강 ›</button>
       </div>
     </div>
-  </div>
-</section>
+    <p class="player-sum" id="p-sum"></p>
+    <ul class="player-points" id="p-points"></ul>
+    <div class="lesson-body" id="p-body"></div>
+    <div class="lesson-foot">
+      <span>이 편의 내용을 직접 만들 시간이 없다면</span>
+      <a href="./outsourcing.html">대신 만들어 드립니다 →</a>
+    </div>
+
+    <div class="lesson-cta">
+      <div>
+        <h3>영상만으로 안 풀리는 지점이 있다면</h3>
+        <p>문의 폼에 「강의 질문」으로 남겨주세요. 하루 안에 답변하고, 같은 질문이 반복되면 강의에 반영합니다.</p>
+      </div>
+      <a class="btn btn-primary" href="./index.html#contact">질문 남기기</a>
+    </div>
+  </main>
+
+  <aside class="player-side">
+    <div class="side-head"><b>커리큘럼</b><span id="p-count"></span></div>
+    <ol class="cur-list" id="cur-list"></ol>
+    <div class="side-cta">
+      <a href="./prompts.html">프롬프트 32개 가져가기 →</a>
+      <a href="./index.html#courses">목표별 코스 로드맵 →</a>
+      <a href="./outsourcing.html">이 작업을 대신 만들어 달라면 →</a>
+    </div>
+  </aside>
+</div>
 
 <footer class="site-footer">
   <div class="wrap">
-    <span><b style="color:var(--ink);">실무AI클래스</b> — 전부 무료로 배우고, 필요하면 대신 만들어 드립니다</span>
-    <span>문의: <a href="mailto:petaflo.com@gmail.com">petaflo.com@gmail.com</a></span>
-    <span><a href="./privacy.html">개인정보처리방침</a></span>
-    <span>© 2026 실무AI클래스</span>
+    <div class="cols">
+      <div>
+        <p class="brand">실무<b>AI</b>클래스</p>
+        <p>전부 무료로 배우고, 필요하면 대신 만들어 드립니다. 외주 제작과 기업 교육으로 운영되는 무료 강의 사이트입니다.</p>
+        <p><a href="mailto:petaflo.com@gmail.com">petaflo.com@gmail.com</a></p>
+      </div>
+      <div>
+        <h4>배우기</h4>
+        <ul>
+          <li><a href="./lessons.html">무료 강의</a></li>
+          <li><a href="./index.html#courses">코스 로드맵</a></li>
+          <li><a href="./prompts.html">프롬프트 32</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>맡기기</h4>
+        <ul>
+          <li><a href="./outsourcing.html">외주 의뢰</a></li>
+          <li><a href="./outsourcing.html#process">진행 절차</a></li>
+          <li><a href="./training.html">기업·기관 교육</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>안내</h4>
+        <ul>
+          <li><a href="./index.html#faq">자주 묻는 질문</a></li>
+          <li><a href="./index.html#contact">문의</a></li>
+          <li><a href="./privacy.html">개인정보처리방침</a></li>
+          <li><a href="./login.html">로그인</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom">
+      <span>© 2026 실무AI클래스</span>
+      <span>모든 강의는 무료이며, 회원가입 없이 볼 수 있습니다.</span>
+    </div>
   </div>
 </footer>
 

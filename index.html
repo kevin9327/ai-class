@@ -20,14 +20,14 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>" />
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css" />
-<link rel="stylesheet" href="./assets/style.css?v=20260905a" />
+<link rel="stylesheet" href="./assets/style.css?v=20260905b" />
 
 <script>window.REL = "./";</script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js" defer></script>
 <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js" defer></script>
-<script src="./assets/config.js?v=20260905a" defer></script>
-<script src="./assets/lessons.js?v=20260905a" defer></script>
-<script src="./assets/app.js?v=20260905a" defer></script>
+<script src="./assets/config.js?v=20260905b" defer></script>
+<script src="./assets/lessons.js?v=20260905b" defer></script>
+<script src="./assets/app.js?v=20260905b" defer></script>
 </head>
 <body>
 
@@ -42,52 +42,108 @@
       <a href="./training.html">기업 교육</a>
       <a href="./index.html#contact">문의</a>
     </nav>
+    <form class="search" role="search" action="./prompts.html" method="get" data-search>
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="search" name="q" placeholder="강의·프롬프트 검색" autocomplete="off" aria-label="강의·프롬프트 검색" />
+      <div class="search-drop" hidden></div>
+    </form>
     <div class="nav-auth" id="nav-auth"></div>
   </div>
 </header>
 
 <section class="hero">
   <div class="wrap">
-    <p class="kicker">전 강의 무료 · 회원가입 없음 · 100% 온라인</p>
-    <h1>실무 AI,<br />전부 무료로 배우세요</h1>
-    <p class="sub">
-      영상 강의 <b data-lesson-count>8</b>강, 프롬프트 32개, 코스 로드맵 3종.
-      결제도 가입도 없이 지금 바로 봅니다. 배우다 막히면 질문하시고,
-      직접 만들 시간이 없으면 대신 만들어 드립니다.
-    </p>
-    <div class="actions">
-      <a class="btn btn-primary btn-lg" href="./lessons.html">무료로 시작하기</a>
-      <a class="btn btn-ghost btn-lg" href="./outsourcing.html">대신 만들어 달라면 →</a>
+    <div>
+      <p class="kicker">전 강의 무료 · 회원가입 없음 · 100% 온라인</p>
+      <h1>실무 AI,<br />전부 무료로 배우세요</h1>
+      <p class="sub">
+        영상 강의 <b data-lesson-count>8</b>강, 프롬프트 32개, 코스 로드맵 3종.
+        결제도 가입도 없이 지금 바로 봅니다. 직접 만들 시간이 없으면 대신 만들어 드립니다.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary btn-lg" href="./lessons.html">무료로 시작하기</a>
+        <a class="btn btn-ghost btn-lg" href="./outsourcing.html">대신 만들어 달라면 →</a>
+      </div>
+      <ul class="points">
+        <li>가입·결제 없이 전편 시청</li>
+        <li>질문·견적은 하루 안에 회신</li>
+        <li>외주·기업교육으로 운영되는 무료</li>
+      </ul>
     </div>
-    <ul class="points">
-      <li>가입·결제 없이 전편 시청</li>
-      <li>질문·견적은 하루 안에 회신</li>
-      <li>외주·기업교육으로 운영되는 무료</li>
-    </ul>
+    <a class="hero-mock" href="./lessons.html#l1" aria-label="1강 바로 보기">
+      <div class="mock-player">
+        <img src="./assets/img/lesson-1.jpg" alt="" width="640" height="360" />
+        <span class="play"></span>
+        <span class="dur">6:38</span>
+      </div>
+      <div class="mock-list">
+        <div class="on"><span class="n">1</span><span>챗GPT·클로드·제미나이, 뭘 언제 쓰나</span><span class="t">6:38</span></div>
+        <div><span class="n">2</span><span>업무에 바로 쓰는 프롬프트 다섯 개</span><span class="t">5:56</span></div>
+        <div><span class="n">3</span><span>보고서 초안 10분에 만들기</span><span class="t">6:29</span></div>
+      </div>
+      <div class="mock-foot"><span class="pill-free">무료</span><span>가입 없이 바로 재생 · 영상 아래 본문과 프롬프트</span></div>
+    </a>
   </div>
 </section>
 
-<section class="section" id="start">
+<div class="stats">
+  <div class="wrap">
+    <div><b><span data-lesson-count>8</span><small>강</small></b><span>무료 영상 강의</span></div>
+    <div><b>32<small>개</small></b><span>복사해서 쓰는 프롬프트</span></div>
+    <div><b>3<small>종</small></b><span>목표별 코스 로드맵</span></div>
+    <div><b>0<small>원</small></b><span>수강료 · 가입비 · 결제</span></div>
+  </div>
+</div>
+
+<section class="section" id="lessons">
   <div class="wrap">
     <div class="section-head">
-      <p class="eyebrow">START HERE</p>
-      <h2>무엇을 도와드릴까요</h2>
-      <p>세 갈래 중 하나를 고르시면 됩니다. 어느 쪽이든 먼저 돈을 내는 단계는 없습니다.</p>
+      <div>
+        <p class="eyebrow">FREE LESSONS</p>
+        <h2>무료 강의 <span data-lesson-count>8</span>강</h2>
+        <p>영상 아래에 본문과 프롬프트가 그대로 있습니다. 순서대로 봐도 되고, 지금 막힌 편만 골라 봐도 됩니다.</p>
+      </div>
+      <a class="more" href="./lessons.html">전체 보기 →</a>
+    </div>
+    <div class="lesson-grid" id="home-lessons">
+      <a class="lcard" href="./lessons.html#l1"><div class="lthumb"><img src="./assets/img/lesson-1.jpg" alt="" loading="lazy" /><span class="play"></span></div><div class="lbody"><span class="lno">1강</span><h3>챗GPT·클로드·제미나이, 뭘 언제 쓰나</h3></div></a>
+      <a class="lcard" href="./lessons.html#l2"><div class="lthumb"><img src="./assets/img/lesson-2.jpg" alt="" loading="lazy" /><span class="play"></span></div><div class="lbody"><span class="lno">2강</span><h3>업무에 바로 쓰는 프롬프트 다섯 개</h3></div></a>
+      <a class="lcard" href="./lessons.html#l3"><div class="lthumb"><img src="./assets/img/lesson-3.jpg" alt="" loading="lazy" /><span class="play"></span></div><div class="lbody"><span class="lno">3강</span><h3>보고서 초안 10분에 만들기</h3></div></a>
+      <a class="lcard" href="./lessons.html#l4"><div class="lthumb"><img src="./assets/img/lesson-4.jpg" alt="" loading="lazy" /><span class="play"></span></div><div class="lbody"><span class="lno">4강</span><h3>회의록, 녹음에서 공유까지</h3></div></a>
+      <a class="lcard" href="./lessons.html#l5"><div class="lthumb"><img src="./assets/img/lesson-5.jpg" alt="" loading="lazy" /><span class="play"></span></div><div class="lbody"><span class="lno">5강</span><h3>엑셀 반복 작업 넘기기</h3></div></a>
+      <a class="lcard" href="./lessons.html#l6"><div class="lthumb"><img src="./assets/img/lesson-6.jpg" alt="" loading="lazy" /><span class="play"></span></div><div class="lbody"><span class="lno">6강</span><h3>사내 자료를 넣고 쓸 때의 보안</h3></div></a>
+      <a class="lcard" href="./lessons.html#l7"><div class="lthumb"><img src="./assets/img/lesson-7.jpg" alt="" loading="lazy" /><span class="play"></span></div><div class="lbody"><span class="lno">7강</span><h3>AI 에이전트란 게 뭔가</h3></div></a>
+      <a class="lcard" href="./lessons.html#l8"><div class="lthumb"><img src="./assets/img/lesson-8.jpg" alt="" loading="lazy" /><span class="play"></span></div><div class="lbody"><span class="lno">8강</span><h3>어디까지 맡기고 어디서 멈출까</h3></div></a>
+    </div>
+  </div>
+</section>
+
+<section class="section alt" id="start">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">START HERE</p>
+        <h2>무엇을 도와드릴까요</h2>
+        <p>세 갈래 중 하나를 고르시면 됩니다. 어느 쪽이든 먼저 돈을 내는 단계는 없습니다.</p>
+      </div>
     </div>
     <div class="persona-grid">
       <a class="persona" href="./lessons.html">
+        <span class="icon"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg></span>
         <span class="num">혼자 배우려는 분</span>
         <h3>무료 강의로 시작</h3>
         <p>업무에 바로 쓰는 영상 8강과 복사해서 쓰는 프롬프트 32개. 순서대로 봐도 되고, 지금 막힌 편만 골라 봐도 됩니다.</p>
         <span class="go">무료 강의 보기 →</span>
       </a>
       <a class="persona hl" href="./outsourcing.html">
+        <span class="icon"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/><path d="m14 5-4 14"/></svg></span>
         <span class="num">대신 만들어 달라는 분</span>
         <h3>외주로 맡기기</h3>
         <p>홈페이지, 업무 자동화, 앱, AI 도입. 화상 미팅과 메시지로만 진행하고 결과물은 소스째 드립니다. 견적은 무료입니다.</p>
         <span class="go">외주 의뢰하기 →</span>
       </a>
       <a class="persona" href="./training.html">
+        <span class="icon"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><circle cx="17" cy="9" r="2.6"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M14.5 18.5a4 4 0 0 1 6.5-2.6"/></svg></span>
         <span class="num">팀에 가르치고 싶은 분</span>
         <h3>기업·기관 교육</h3>
         <p>임직원 생성형 AI 실무부터 에이전트 심화까지. Zoom 라이브를 기본으로, 참석자의 실제 업무를 재료로 실습합니다.</p>
@@ -97,100 +153,97 @@
   </div>
 </section>
 
-<section class="why-free">
-  <div class="wrap">
-    <p class="eyebrow">왜 무료인가요</p>
-    <h2>이 사이트는 외주 제작과 기업 교육으로 운영됩니다</h2>
-    <p>
-      개인 수강생에게는 돈을 받지 않습니다. 무료 강의는 명함입니다.
-      보시고 나서 "이건 직접 하기 어렵다" 싶은 일을 맡겨 주시거나, 팀 교육을 의뢰해 주시면 그게 수업료입니다.
-      그럴 일이 없어도 괜찮습니다 — 봐 주시는 것만으로 충분합니다.
-    </p>
-  </div>
-</section>
-
-<section class="section" id="lessons">
+<section class="section" id="courses">
   <div class="wrap">
     <div class="section-head">
-      <p class="eyebrow">FREE LESSONS</p>
-      <h2>무료 강의 <span data-lesson-count>8</span>강</h2>
-      <p>영상 아래에 본문과 프롬프트가 그대로 있습니다. 제목을 누르면 해당 편으로 바로 갑니다.</p>
-    </div>
-    <ol class="home-lessons" id="home-lessons">
-      <li><a href="./lessons.html"><span class="no">1강</span><span class="ttl">챗GPT·클로드·제미나이, 뭘 언제 쓰나</span></a></li>
-      <li><a href="./lessons.html"><span class="no">2강</span><span class="ttl">업무에 바로 쓰는 프롬프트 다섯 개</span></a></li>
-      <li><a href="./lessons.html"><span class="no">3강</span><span class="ttl">보고서 초안 10분에 만들기</span></a></li>
-      <li><a href="./lessons.html"><span class="no">4강</span><span class="ttl">회의록, 녹음에서 공유까지</span></a></li>
-      <li><a href="./lessons.html"><span class="no">5강</span><span class="ttl">엑셀 반복 작업 넘기기</span></a></li>
-      <li><a href="./lessons.html"><span class="no">6강</span><span class="ttl">사내 자료를 넣고 쓸 때의 보안</span></a></li>
-      <li><a href="./lessons.html"><span class="no">7강</span><span class="ttl">AI 에이전트란 게 뭔가</span></a></li>
-      <li><a href="./lessons.html"><span class="no">8강</span><span class="ttl">어디까지 맡기고 어디서 멈출까</span></a></li>
-    </ol>
-    <div class="row-cta">
-      <a class="btn btn-primary" href="./lessons.html">전체 강의 보기</a>
-      <a class="btn btn-ghost" href="./prompts.html">프롬프트 32개 보기</a>
-    </div>
-  </div>
-</section>
-
-<section class="section alt" id="courses">
-  <div class="wrap">
-    <div class="section-head">
-      <p class="eyebrow">COURSES</p>
-      <h2>목표별 코스 로드맵</h2>
-      <p>무료 강의와 프롬프트를 목표에 맞게 순서대로 엮은 것입니다. 4단계를 따라가면 하나의 결과물이 남습니다.</p>
+      <div>
+        <p class="eyebrow">COURSES</p>
+        <h2>목표별 코스 로드맵</h2>
+        <p>무료 강의와 프롬프트를 목표에 맞게 순서대로 엮은 것입니다. 4단계를 따라가면 하나의 결과물이 남습니다.</p>
+      </div>
     </div>
     <div class="course-grid">
       <a class="course-card" href="./courses/vibe-coding.html">
-        <img class="thumb" src="./assets/img/course-vibe-coding.png" alt="클로드 코드로 시작하는 바이브코딩" />
+        <img class="thumb" src="./assets/img/course-vibe-coding.png" alt="클로드 코드로 시작하는 바이브코딩" loading="lazy" />
         <div class="body">
           <div class="badges"><span class="badge free">무료 코스</span><span class="badge gray">입문 · 코딩 경험 불필요</span></div>
           <h3>클로드 코드로 시작하는 바이브코딩</h3>
           <p class="desc">코딩을 몰라도 됩니다. 환경 설정부터 첫 배포까지, 내 아이디어를 실제로 돌아가는 것으로 만듭니다.</p>
-          <div class="meta-row"><span>4단계 로드맵</span><span>관련 강의 7·8강</span></div>
+          <div class="meta-row">
+            <span><svg class="ico" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>4단계</span>
+            <span><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg>관련 강의 7·8강</span>
+            <span><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>자유</span>
+          </div>
         </div>
       </a>
-
       <a class="course-card" href="./courses/automation.html">
-        <img class="thumb" src="./assets/img/course-automation.png" alt="반복 업무 자동화 실전" />
+        <img class="thumb" src="./assets/img/course-automation.png" alt="반복 업무 자동화 실전" loading="lazy" />
         <div class="body">
           <div class="badges"><span class="badge free">무료 코스</span><span class="badge gray">직장인 · 자영업</span></div>
           <h3>반복 업무 자동화 실전</h3>
           <p class="desc">엑셀 정산, 문서 정리, 보고서 초안. 매달 며칠씩 잡아먹는 일을 하나 골라 자동화합니다.</p>
-          <div class="meta-row"><span>4단계 로드맵</span><span>관련 강의 3·4·5·6강</span></div>
+          <div class="meta-row">
+            <span><svg class="ico" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>4단계</span>
+            <span><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg>관련 강의 3·4·5·6강</span>
+            <span><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>자유</span>
+          </div>
         </div>
       </a>
-
       <a class="course-card" href="./courses/ai-content.html">
-        <img class="thumb" src="./assets/img/course-ai-content.png" alt="AI 콘텐츠 제작 실전" />
+        <img class="thumb" src="./assets/img/course-ai-content.png" alt="AI 콘텐츠 제작 실전" loading="lazy" />
         <div class="body">
           <div class="badges"><span class="badge free">무료 코스</span><span class="badge gray">콘텐츠 · 마케팅</span></div>
           <h3>AI 콘텐츠 제작 실전</h3>
           <p class="desc">블로그 글, 상세페이지, 숏폼까지. 내 채널에 바로 올릴 결과물을 만들면서 제작 파이프라인을 갖춥니다.</p>
-          <div class="meta-row"><span>4단계 로드맵</span><span>관련 강의 2·3강 + 프롬프트</span></div>
+          <div class="meta-row">
+            <span><svg class="ico" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>4단계</span>
+            <span><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg>관련 강의 2·3강 + 프롬프트</span>
+            <span><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>자유</span>
+          </div>
         </div>
       </a>
     </div>
+  </div>
+</section>
+
+<section class="why-free">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow">왜 무료인가요</p>
+      <h2>이 사이트는 외주 제작과 기업 교육으로 운영됩니다</h2>
+      <p>
+        개인 수강생에게는 돈을 받지 않습니다. 무료 강의는 명함입니다.
+        보시고 나서 "이건 직접 하기 어렵다" 싶은 일을 맡겨 주시거나, 팀 교육을 의뢰해 주시면 그게 수업료입니다.
+        그럴 일이 없어도 괜찮습니다 — 봐 주시는 것만으로 충분합니다.
+      </p>
+    </div>
+    <a class="btn btn-ghost" href="#faq">자주 묻는 질문</a>
   </div>
 </section>
 
 <section class="section" id="work">
   <div class="wrap">
     <div class="section-head">
-      <p class="eyebrow">OUTSOURCING</p>
-      <h2>대신 만들어 드립니다</h2>
-      <p>배울 시간이 없거나, 배우는 것보다 맡기는 게 싼 일이 있습니다. 100% 원격으로 만들어 소스째 드립니다.</p>
+      <div>
+        <p class="eyebrow">OUTSOURCING</p>
+        <h2>대신 만들어 드립니다</h2>
+        <p>배울 시간이 없거나, 배우는 것보다 맡기는 게 싼 일이 있습니다. 100% 원격으로 만들어 소스째 드립니다.</p>
+      </div>
+      <a class="more" href="./outsourcing.html">외주 안내 전체 →</a>
     </div>
     <div class="svc-grid">
       <div class="svc">
+        <span class="icon"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span>
         <h3>홈페이지 · 랜딩페이지</h3>
         <p>회사 소개, 신청·예약 폼, 포트폴리오. 모바일 대응과 도메인 연결까지. 유지보수가 필요 없는 정적 사이트를 기본으로 합니다.</p>
       </div>
       <div class="svc">
+        <span class="icon"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 3 5 14h6l-1 7 8-11h-6z"/></svg></span>
         <h3>업무 자동화</h3>
         <p>엑셀 정산·취합, 반복 문서 생성, 웹 데이터 수집, 메일·알림 자동화. 매달 며칠 걸리던 일을 버튼 하나로 만듭니다.</p>
       </div>
       <div class="svc">
+        <span class="icon"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18h2"/></svg></span>
         <h3>앱 · 프로그램 · AI 도입</h3>
         <p>안드로이드 앱, 웹앱, 재고·근태·예약 같은 사내 도구. 클로드·GPT를 업무에 붙이는 설계와 프롬프트·에이전트 파이프라인.</p>
       </div>
@@ -220,7 +273,6 @@
   </div>
 </section>
 
-
 <section class="help-block" id="help">
   <div class="wrap">
     <p class="eyebrow">실무AI클래스를 돕는 법</p>
@@ -240,8 +292,10 @@
 <section class="section" id="faq">
   <div class="wrap">
     <div class="section-head">
-      <p class="eyebrow">FAQ</p>
-      <h2>자주 묻는 질문</h2>
+      <div>
+        <p class="eyebrow">FAQ</p>
+        <h2>자주 묻는 질문</h2>
+      </div>
     </div>
     <div class="faq">
       <details>
@@ -250,7 +304,7 @@
       </details>
       <details>
         <summary>왜 무료로 하나요?</summary>
-        <p>강의를 팔아 버는 돈보다, 강의를 본 분이 일을 맡기거나 팀 교육을 의뢰해 주시는 쪽이 서로에게 낫습니다. 무료 강의가 "이 사람이 어떻게 일하는지" 보여주는 명함 역할을 합니다.</p>
+        <p>강의를 팔아 버는 돈보다, 강의를 본 분이 일을 맡기거나 팀 교육을 의뢰해 주시는 쪽이 서로에게 낫습니다. 무료 강의가 "어떻게 일하는지" 보여주는 명함 역할을 합니다.</p>
       </details>
       <details>
         <summary>회원가입은 언제 필요한가요?</summary>
@@ -271,9 +325,11 @@
 <section class="section alt" id="contact">
   <div class="wrap">
     <div class="section-head">
-      <p class="eyebrow">CONTACT</p>
-      <h2>문의</h2>
-      <p>외주·기업교육·강의 질문 모두 이 폼 하나로 받습니다. 하루 안에 회신합니다.</p>
+      <div>
+        <p class="eyebrow">CONTACT</p>
+        <h2>문의</h2>
+        <p>외주·기업교육·강의 질문 모두 이 폼 하나로 받습니다. 하루 안에 회신합니다.</p>
+      </div>
     </div>
 
     <div class="contact-grid">
@@ -331,10 +387,42 @@
 
 <footer class="site-footer">
   <div class="wrap">
-    <span><b style="color:var(--ink);">실무AI클래스</b> — 전부 무료로 배우고, 필요하면 대신 만들어 드립니다</span>
-    <span>문의: <a href="mailto:petaflo.com@gmail.com">petaflo.com@gmail.com</a></span>
-    <span><a href="./privacy.html">개인정보처리방침</a></span>
-    <span>© 2026 실무AI클래스</span>
+    <div class="cols">
+      <div>
+        <p class="brand">실무<b>AI</b>클래스</p>
+        <p>전부 무료로 배우고, 필요하면 대신 만들어 드립니다. 외주 제작과 기업 교육으로 운영되는 무료 강의 사이트입니다.</p>
+        <p><a href="mailto:petaflo.com@gmail.com">petaflo.com@gmail.com</a></p>
+      </div>
+      <div>
+        <h4>배우기</h4>
+        <ul>
+          <li><a href="./lessons.html">무료 강의</a></li>
+          <li><a href="./index.html#courses">코스 로드맵</a></li>
+          <li><a href="./prompts.html">프롬프트 32</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>맡기기</h4>
+        <ul>
+          <li><a href="./outsourcing.html">외주 의뢰</a></li>
+          <li><a href="./outsourcing.html#process">진행 절차</a></li>
+          <li><a href="./training.html">기업·기관 교육</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>안내</h4>
+        <ul>
+          <li><a href="./index.html#faq">자주 묻는 질문</a></li>
+          <li><a href="./index.html#contact">문의</a></li>
+          <li><a href="./privacy.html">개인정보처리방침</a></li>
+          <li><a href="./login.html">로그인</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom">
+      <span>© 2026 실무AI클래스</span>
+      <span>모든 강의는 무료이며, 회원가입 없이 볼 수 있습니다.</span>
+    </div>
   </div>
 </footer>
 
