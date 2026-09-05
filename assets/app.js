@@ -1,4 +1,4 @@
-/* 실무AI클래스 공통 스크립트
+/* 실무AI클래스 공통 스크립트 — 전면 무료 인강 + 외주·기업교육 접수
    각 페이지는 이 파일보다 먼저 window.REL("./" 또는 "../")을 선언한다. */
 (function () {
   "use strict";
@@ -11,16 +11,13 @@
     "automation": { title: "반복 업무 자동화 실전" },
     "ai-content": { title: "AI 콘텐츠 제작 실전" }
   };
+  /* 「내 강의에 담기」가 남기는 문서의 planCode 접미사. Firestore 규칙(validPlan)이 이 형태를 요구한다. */
+  var FREE_PLAN = "pack4";
+  var PLAN_LABEL = { pack4: "무료 코스", single: "무료 코스", group: "무료 코스" };
 
-  var PLANS = {
-    pack4: { name: "1:1 라이브 4회 패키지 (회당 2시간)", amount: 499000, was: 596000 },
-    single: { name: "단회 체험 2시간", amount: 149000 },
-    group: { name: "소그룹 3~5인 · 1인 2시간", amount: 89000 }
-  };
-
-  /* ── 회원·DB: Firebase (Spark 무료 플랜 — 카드 없음·정지 없음·과금 불가) ─────
-     config.FIREBASE(apiKey·authDomain·projectId·appId)가 채워지고 SDK가 로드되면 켜진다.
-     Firestore: users/{uid} · enrollments/{uid_planCode} · settings/site(freePeriod, admins[]) */
+  /* ── 회원·DB: Firebase (Spark 무료 플랜) ─────
+     config.FIREBASE가 채워지고 SDK가 로드되면 켜진다.
+     Firestore: users/{uid} · enrollments/{uid_planCode} · settings/site(freePeriod, admins[], adminEmails[]) */
   var fb = null;
   if (cfg.FIREBASE && cfg.FIREBASE.apiKey && window.firebase) {
     if (!window.firebase.apps.length) window.firebase.initializeApp(cfg.FIREBASE);
@@ -62,17 +59,17 @@
     });
   }
 
-  /* 사이트 루트 절대경로 (예: /ai-class/) — 결제 리다이렉트 URL 계산용 */
+  /* 사이트 루트 절대경로 (예: /ai-class/) — 로그인 후 복귀 URL 검증용 */
   function siteRoot() {
     return location.pathname
       .replace(/(courses|pay)\/[^\/]*$/, "")
       .replace(/[^\/]*$/, "");
   }
 
-  function payStatus(msg, kind) {
+  function sideStatus(msg, kind) {
     var el = document.getElementById("pay-status");
     if (!el) { if (msg) alert(msg); return; }
-    el.textContent = msg || "";
+    el.innerHTML = msg || "";
     if (kind) { el.setAttribute("data-kind", kind); } else { el.removeAttribute("data-kind"); }
   }
 
@@ -81,10 +78,7 @@
     var el = document.getElementById("nav-auth");
     if (!el) return;
 
-    if (!fb) {
-      el.innerHTML = '<a class="btn btn-ghost" href="' + REL + 'index.html#contact">수강 문의</a>';
-      return;
-    }
+    if (!fb) { el.innerHTML = ""; return; }
 
     currentUser().then(function (user) {
       if (user) {
@@ -95,236 +89,56 @@
           fb.auth.signOut().then(function () { location.href = REL + "index.html"; });
         });
       } else {
-        el.innerHTML =
-          '<a href="' + REL + 'login.html">로그인</a>' +
-          '<a class="btn btn-primary" href="' + REL + 'login.html?tab=signup">회원가입</a>';
+        el.innerHTML = '<a href="' + REL + 'login.html">로그인</a>';
       }
     });
   }
 
-  /* ── 토스 미설정 시 결제 체인 ───────────────────
-     1) PAYAPP_USERID  → 페이앱 결제창 (카드·카카오페이·네이버페이). 사업자 없는 개인도 가능.
-     2) PAY_LINKS[코드] → 결제 링크 새 창 (페이앱 블로그페이 주문서 등)
-     3) KAKAOPAY_LINK  → 카카오페이 송금 링크 (수수료 0, 입금 수동 확인)
-     4) 없음           → 문의 폼 */
-  var PAYAPP_JS = "https://lite.payapp.kr/public/api/v2/payapp-lite.js";
-
-  function won(n) { return n.toLocaleString("ko-KR") + "원"; }
-  function planCode(courseId, planKey) { return courseId + "-" + planKey; }
-
-  /* 결제창은 클릭 핸들러 안에서 동기로 열어야 팝업 차단을 피한다 → 스크립트를 페이지 로드 때 미리 받아둔다 */
-  function preloadPayApp() {
-    if (!cfg.PAYAPP_USERID || window.PayApp || document.getElementById("payapp-js")) return;
-    var s = document.createElement("script");
-    s.id = "payapp-js"; s.src = PAYAPP_JS; s.async = true;
-    document.head.appendChild(s);
-  }
-
-  /* 결제 뒤 일정 요청 폼(#after-pay)을 펼치고 값을 채운다 */
-  function showAfterPay(courseId, planKey, method, buyer) {
-    var box = document.getElementById("after-pay");
-    if (!box) return;
-    var course = COURSES[courseId], plan = PLANS[planKey];
-    function set(name, val) {
-      var el = box.querySelector('[name="' + name + '"]');
-      if (el && val) el.value = val;
-    }
-    set("강의", course.title + " — " + plan.name + " (" + won(plan.amount) + ")");
-    set("결제수단", method);
-    if (buyer) { set("이름", buyer.name); set("연락처", buyer.phone); set("이메일", buyer.email); }
-    box.hidden = false;
-    box.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
-  function openPayApp(courseId, planKey, buyer) {
-    var course = COURSES[courseId], plan = PLANS[planKey];
-    if (!window.PayApp) {
-      payStatus("결제 모듈을 아직 불러오지 못했습니다. 잠시 후 다시 눌러주세요.", "error");
-      preloadPayApp();
-      return;
-    }
-    window.PayApp.setDefault("userid", cfg.PAYAPP_USERID);
-    window.PayApp.setDefault("shopname", cfg.PAYAPP_SHOPNAME || "실무AI클래스");
-    window.PayApp.payrequest({
-      goodname: course.title + " — " + plan.name,
-      price: String(plan.amount),
-      recvphone: buyer.phone,
-      memo: "실무AI클래스 수강료",
-      smsuse: "n",       // 문자 결제요청을 보내지 않고
-      redirectpay: "1",  // 결제창을 바로 연다
-      var1: planCode(courseId, planKey),
-      var2: buyer.name
-    });
-    payStatus("결제창이 열렸습니다. 결제를 마치면 아래 일정 요청을 보내주세요. 24시간 안에 연락드립니다.", "ok");
-    showAfterPay(courseId, planKey, "페이앱 카드결제", buyer);
-  }
-
-  /* 페이앱은 구매자 휴대폰 번호가 필수 → 이름·번호를 받는 작은 폼을 플랜 아래 펼친다 */
-  function askBuyer(courseId, planKey) {
-    var host = document.getElementById("pay-status");
-    if (!host) return;
-    var old = document.getElementById("buyer-form");
-    if (old) old.remove();
-    var plan = PLANS[planKey];
-    var f = document.createElement("form");
-    f.className = "buyer-form"; f.id = "buyer-form";
-    f.innerHTML =
-      '<p class="buyer-title"><b>' + esc(plan.name) + '</b> · ' + won(plan.amount) + '</p>' +
-      '<div class="buyer-grid">' +
-        '<input type="text" name="buyer_name" placeholder="이름" autocomplete="name" required />' +
-        '<input type="text" name="buyer_phone" placeholder="휴대폰 010-0000-0000" autocomplete="tel" inputmode="tel" required />' +
-        '<button type="submit" class="btn btn-primary">결제창 열기</button>' +
-      '</div>' +
-      '<p class="buyer-note">결제창은 페이앱(payapp.kr)에서 열리며 카드·카카오페이·네이버페이를 쓸 수 있습니다. 번호는 결제 확인과 일정 연락에만 씁니다.</p>';
-    host.insertAdjacentElement("beforebegin", f);
-    f.addEventListener("submit", function (e) {
-      e.preventDefault();
-      var name = f.elements.buyer_name.value.trim();
-      var phone = f.elements.buyer_phone.value.replace(/[^0-9]/g, "");
-      if (!name || !/^01[016789][0-9]{7,8}$/.test(phone)) {
-        payStatus("이름과 휴대폰 번호를 확인해주세요.", "error");
-        return;
-      }
-      openPayApp(courseId, planKey, { name: name, phone: phone });
-    });
-    f.elements.buyer_name.focus();
-    payStatus("");
-  }
-
-  /* ── 무료 기간 모드 (config.FREE_PERIOD) ─────────
-     결제 대신 "지금은 무료 기간입니다" 안내 후 신청 폼만 받는다. false로 바꾸면 아래 결제 체인으로 복귀. */
-  function applyFreeForm(box) {
-    if (!box || box.getAttribute("data-free") === "1") return;
-    var h = box.querySelector("h3"), lead = box.querySelector(":scope > p");
-    if (h) h.textContent = "무료 기간 신청";
-    if (lead) lead.textContent = "결제 없이 신청만 남겨주시면 24시간 안에 연락드려 첫 수업 일정을 잡습니다.";
-    function set(name, val) { var el = box.querySelector('[name="' + name + '"]'); if (el) el.value = val; }
-    set("_subject", "[실무AI클래스] 무료 기간 신청");
-    set("구분", "무료 기간 신청");
-    set("_next", "https://kevin9327.github.io/ai-class/thanks.html");
-    var nameLabel = box.querySelector('label[for="ap-name"]');
-    if (nameLabel) nameLabel.textContent = "이름";
-    var btn = box.querySelector('button[type="submit"]');
-    if (btn) btn.textContent = "무료로 신청하기";
-    box.setAttribute("data-free", "1");
-  }
-
-  function freeEnroll(courseId, planKey) {
-    var box = document.getElementById("after-pay");
-    if (!box) { location.href = REL + "index.html#contact"; return; }
-    applyFreeForm(box);
-    var note = cfg.FREE_PERIOD_NOTE || "지금은 무료 기간입니다. 결제 없이 아래 신청만 남겨주세요.";
-    var code = planCode(courseId, planKey);
-
-    /* 회원 시스템 없이: 신청 폼만 */
+  /* ── 「내 강의에 담기」 ─────────────────────────
+     강의는 로그인 없이 전부 볼 수 있다. 담기만 계정에 기록한다. */
+  function enroll(courseId) {
+    var course = COURSES[courseId];
+    if (!course) return;
     if (!fb || !fb.db) {
-      payStatus(note, "ok");
-      showAfterPay(courseId, planKey, "무료 기간 (0원)");
+      sideStatus("담기 기능은 잠시 꺼져 있습니다. 강의는 그대로 보실 수 있습니다.");
       return;
     }
-
-    /* 회원 시스템 있음: 로그인 계정에 신청을 기록(내 강의에 표시)하고 일정 폼을 펼친다 */
+    var code = courseId + "-" + FREE_PLAN;
     currentUser().then(function (user) {
       if (!user) {
-        payStatus("무료 기간입니다. 로그인하면(회원가입 10초) 신청이 계정에 기록됩니다. 잠시 후 로그인 화면으로 이동합니다.", "ok");
-        setTimeout(function () {
-          location.href = REL + "login.html?next=" + encodeURIComponent(location.pathname + "#plans");
-        }, 1200);
+        location.href = REL + "login.html?next=" + encodeURIComponent(location.pathname + "#plans");
         return;
       }
-      payStatus("신청을 계정에 기록하는 중입니다…");
-      var name = user.displayName || "";
+      sideStatus("담는 중입니다…");
       var ref = fb.db.collection("enrollments").doc(user.uid + "_" + code);
       ref.get().then(function (snap) {
         if (snap.exists) return true;
         return ref.set({
-          uid: user.uid, email: user.email || "", name: name,
+          uid: user.uid, email: user.email || "", name: user.displayName || "",
           courseId: courseId, planCode: code, amount: 0, status: "free",
           createdAt: window.firebase.firestore.FieldValue.serverTimestamp()
         }).then(function () { return false; });
       }).then(function (already) {
-        payStatus(already ? "이미 신청된 구성입니다. 아래에 가능한 일정만 남겨주세요." : note, "ok");
-        showAfterPay(courseId, planKey, "무료 기간 (0원) · 계정 " + (user.email || user.uid), { name: name, email: user.email });
+        sideStatus((already ? "이미 담겨 있습니다. " : "담았습니다. ") +
+          '<a href="' + REL + 'my.html">내 강의 보기 →</a>', "ok");
       }).catch(function (e) {
-        payStatus("신청 기록에 실패했습니다: " +
-          (e && e.code === "permission-denied" ? "무료 기간이 끝났거나 권한이 없습니다." : (e && e.message)), "error");
+        sideStatus("담지 못했습니다: " + esc(e && e.code === "permission-denied" ? "권한이 없습니다." : (e && e.message)), "error");
       });
     });
   }
 
-  function initFreePeriod() {
-    if (!cfg.FREE_PERIOD) return;
-    document.documentElement.setAttribute("data-free-period", "1");
-    var badge = '<span class="free-badge">무료 기간</span>';
-
-    /* 메인 강의 카드: 16% · 596,000 · 499,000원 → [무료 기간] 499,000원(취소선) 무료 */
-    Array.prototype.forEach.call(document.querySelectorAll(".price-row"), function (row) {
-      var now = row.querySelector(".now"), was = row.querySelector(".was"), sale = row.querySelector(".sale");
-      if (!now) return;
-      if (sale) { sale.outerHTML = badge; } else { row.insertAdjacentHTML("afterbegin", badge); }
-      if (was) { was.textContent = now.textContent; }
-      else { now.insertAdjacentHTML("beforebegin", '<span class="was">' + esc(now.textContent) + "</span>"); }
-      now.textContent = "무료";
-    });
-    /* 상세 페이지 플랜: <small>596,000</small>499,000원 → <small>499,000원</small>무료 [무료 기간] */
-    Array.prototype.forEach.call(document.querySelectorAll(".plan-box .amount"), function (amt) {
-      var price = "";
-      Array.prototype.forEach.call(amt.childNodes, function (n) { if (n.nodeType === 3) price += n.textContent; });
-      amt.innerHTML = "<small>" + esc(price.trim()) + "</small>무료 " + badge;
-    });
-    Array.prototype.forEach.call(document.querySelectorAll("[data-enroll]"), function (b) { b.textContent = "무료로 신청"; });
-    var note = document.querySelector(".course-grid + p.status");
-    if (note) note.innerHTML = "<b>지금은 무료 기간입니다.</b> 1:1 4회 · 단회 · 소그룹 모두 결제 없이 신청만 남기시면 됩니다. 상세 페이지에서 구성을 고르세요.";
-    applyFreeForm(document.getElementById("after-pay"));
-    if (fb && location.hash === "#plans" && document.getElementById("pay-status")) {
-      currentUser().then(function (u) {
-        if (u) payStatus("로그인되었습니다. 원하는 구성의 「무료로 신청」을 눌러주세요.", "ok");
-      });
-    }
-    var ps = document.getElementById("pay-status"), rn = ps && ps.nextElementSibling;
-    if (rn && rn.classList.contains("notice")) rn.hidden = true; // free mode: refund notice is moot
-  }
-
-  function fallbackPay(courseId, planKey) {
-    var plan = PLANS[planKey];
-    var link = (cfg.PAY_LINKS || {})[planCode(courseId, planKey)];
-
-    if (cfg.PAYAPP_USERID) { askBuyer(courseId, planKey); return; }
-
-    if (link) {
-      window.open(link, "_blank", "noopener");
-      payStatus("새 창에서 결제를 마친 뒤, 아래 일정 요청을 보내주세요. 24시간 안에 연락드립니다.", "ok");
-      showAfterPay(courseId, planKey, "결제 링크");
-      return;
-    }
-    if (cfg.KAKAOPAY_LINK) {
-      window.open(cfg.KAKAOPAY_LINK, "_blank", "noopener");
-      payStatus("카카오페이로 " + won(plan.amount) + "을 보내신 뒤, 아래 일정 요청에 입금자명을 적어주세요. 확인 즉시 연락드립니다.", "ok");
-      showAfterPay(courseId, planKey, "카카오페이 송금 " + won(plan.amount));
-      return;
-    }
-    payStatus("온라인 결제를 준비하고 있습니다. 문의를 남겨주시면 결제 방법을 바로 안내해 드립니다.");
-    setTimeout(function () { location.href = REL + "index.html#contact"; }, 1800);
-  }
-
-  /* ── 수강신청 ─────────────────────────────────
-     무료 기간이면 계정에 기록(freeEnroll), 아니면 결제 체인(fallbackPay). */
-  function enroll(courseId, planKey) {
-    var course = COURSES[courseId], plan = PLANS[planKey];
-    if (!course || !plan) return;
-    if (cfg.FREE_PERIOD) { freeEnroll(courseId, planKey); return; }
-    fallbackPay(courseId, planKey);
-  }
-
-  /* 수강신청 버튼 배선: <button data-enroll data-course="..." data-plan-key="..."> */
   function initEnrollButtons() {
-    var btns = document.querySelectorAll("[data-enroll]");
-    Array.prototype.forEach.call(btns, function (btn) {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-enroll]"), function (btn) {
       btn.addEventListener("click", function (e) {
         e.preventDefault();
-        enroll(btn.getAttribute("data-course"), btn.getAttribute("data-plan-key"));
+        enroll(btn.getAttribute("data-course"));
       });
     });
+    if (fb && location.hash === "#plans" && document.getElementById("pay-status")) {
+      currentUser().then(function (u) {
+        if (u) sideStatus("로그인되었습니다. 「내 강의에 담기」를 다시 눌러주세요.", "ok");
+      });
+    }
   }
 
   /* ── 로그인 페이지 ─────────────────────────── */
@@ -368,7 +182,7 @@
       }).catch(function () { /* 프로필 실패는 로그인 자체를 막지 않는다 */ });
     }
 
-    /* 이미 로그인된 상태로 로그인 페이지에 오면(예: Google 리디렉션 복귀) 바로 next로 */
+    /* 이미 로그인된 상태로 로그인 페이지에 오면 바로 next로 */
     if (fb) {
       currentUser().then(function (u) { if (u) afterLogin(); });
     }
@@ -400,7 +214,7 @@
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       if (!fb) {
-        statusEl.textContent = "회원 시스템 오픈을 준비하고 있습니다. 조금만 기다려주세요.";
+        statusEl.textContent = "회원 시스템 오픈을 준비하고 있습니다. 강의는 로그인 없이 보실 수 있습니다.";
         return;
       }
       var email = document.getElementById("auth-email").value.trim();
@@ -454,7 +268,7 @@
         var rows = []; qs.forEach(function (d) { rows.push(d.data()); });
         rows.sort(function (x, y) { return tsMs(y.createdAt) - tsMs(x.createdAt); });
         if (!rows.length) {
-          listEl.innerHTML = '<p class="empty">아직 신청 내역이 없습니다.<br/>강의 페이지에서 「무료로 신청」을 누르면 여기에 기록됩니다.</p>';
+          listEl.innerHTML = '<p class="empty">아직 담은 코스가 없습니다.<br/>코스 페이지에서 「내 강의에 담기」를 누르면 여기에 모입니다.</p>';
           return;
         }
         listEl.innerHTML = rows.map(renderRow).join("");
@@ -464,33 +278,35 @@
       isAdminUser(user).then(function (ok) {
         if (!ok) return;
         listEl.insertAdjacentHTML("afterend",
-          '<p class="status" style="margin-top:22px;">운영자 계정입니다 · <a href="' + REL + 'admin.html" style="color:var(--brand);font-weight:700;">신청 현황 보기</a></p>');
+          '<p class="status" style="margin-top:22px;">운영자 계정입니다 · <a href="' + REL + 'admin.html" style="color:var(--brand);font-weight:700;">담기 현황 보기</a></p>');
       });
     });
   }
 
   function statusPill(st) {
-    return st === "paid" ? '<span class="pill ok">결제 완료</span>'
-      : st === "free" ? '<span class="pill ok">무료 기간 신청</span>'
-      : st === "done" ? '<span class="pill ok">수강 완료</span>'
-      : st === "pending" ? '<span class="pill pending">결제 대기</span>'
+    return st === "free" ? '<span class="pill ok">담김</span>'
+      : st === "done" ? '<span class="pill ok">완료</span>'
+      : st === "paid" ? '<span class="pill ok">결제 완료</span>'
+      : st === "pending" ? '<span class="pill pending">대기</span>'
       : '<span class="pill bad">' + esc(st || "") + '</span>';
+  }
+  function courseLink(courseId) {
+    return REL + "courses/" + courseId + ".html";
   }
   function rowLabels(o) {
     var course = COURSES[o.courseId] || { title: o.courseId };
     var planKey = String(o.planCode || "").replace(o.courseId + "-", "");
-    var plan = PLANS[planKey] || { name: o.planCode };
-    return { course: course.title, plan: plan.name };
+    return { course: course.title, plan: PLAN_LABEL[planKey] || o.planCode };
   }
   function renderRow(o) {
     var l = rowLabels(o);
-    var amountText = o.status === "free" ? "무료" : Number(o.amount || 0).toLocaleString("ko-KR") + "원";
     var date = tsMs(o.createdAt) ? new Date(tsMs(o.createdAt)).toLocaleDateString("ko-KR") : "";
-    return '<div class="order-item"><div class="meta"><b>' + esc(l.course) + "</b><span>" +
-      esc(l.plan) + " · " + amountText + " · " + date + "</span></div>" + statusPill(o.status) + "</div>";
+    var href = COURSES[o.courseId] ? courseLink(o.courseId) : "#";
+    return '<div class="order-item"><div class="meta"><b><a href="' + esc(href) + '">' + esc(l.course) + "</a></b><span>" +
+      esc(l.plan) + " · " + date + "</span></div>" + statusPill(o.status) + "</div>";
   }
 
-  /* ── 운영자 페이지 (admin.html) — settings/site.admins 에 uid 가 있는 계정만 ── */
+  /* ── 운영자 페이지 (admin.html) — settings/site.admins / adminEmails 계정만 ── */
   function initAdminPage() {
     var root = document.getElementById("admin-root");
     if (!root) return;
@@ -525,25 +341,25 @@
       return "<tr><td>" + esc(when) + "</td><td>" + esc(o.email || "") + "</td><td>" + esc(o.name || "") +
         "</td><td>" + esc(l.course) + "</td><td>" + esc(l.plan) + "</td><td>" + statusPill(o.status) + "</td></tr>";
     }).join("");
-    var csvRows = [["일시", "이메일", "이름", "강의", "구성", "상태"]].concat(rows.map(function (o) {
+    var csvRows = [["일시", "이메일", "이름", "코스", "구성", "상태"]].concat(rows.map(function (o) {
       var l = rowLabels(o), ms = tsMs(o.createdAt);
       return [ms ? new Date(ms).toISOString() : "", o.email || "", o.name || "", l.course, l.plan, o.status || ""];
     }));
     var csv = csvRows.map(function (r) {
       return r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(",");
     }).join("\r\n");
-    var blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+    var blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" });
 
     root.innerHTML =
-      '<p class="admin-summary">신청 <b>' + rows.length + '</b>건 &nbsp;' +
+      '<p class="admin-summary">담기 <b>' + rows.length + '</b>건 &nbsp;' +
       '<a class="btn btn-ghost" id="csv-dl" download="signups.csv">CSV 내려받기</a></p>' +
       '<div class="table-wrap"><table class="admin-table"><thead><tr>' +
-      '<th>일시</th><th>이메일</th><th>이름</th><th>강의</th><th>구성</th><th>상태</th></tr></thead><tbody>' +
-      (body || '<tr><td colspan="6" class="empty">아직 신청이 없습니다.</td></tr>') + "</tbody></table></div>";
+      '<th>일시</th><th>이메일</th><th>이름</th><th>코스</th><th>구성</th><th>상태</th></tr></thead><tbody>' +
+      (body || '<tr><td colspan="6" class="empty">아직 담은 사람이 없습니다.</td></tr>') + "</tbody></table></div>";
     document.getElementById("csv-dl").href = URL.createObjectURL(blob);
   }
 
-  /* ── 문의 폼 ─────────────────────────────────── */
+  /* ── 문의·견적 폼 (FormSubmit) — required 필드 기준으로 검사 ─── */
   function initInquiryForm() {
     var form = document.getElementById("inquiry");
     if (!form) return;
@@ -552,28 +368,46 @@
 
     form.addEventListener("submit", function (e) {
       var gaps = [];
-      if (!document.getElementById("name").value.trim()) gaps.push("이름");
-      if (!document.getElementById("contact").value.trim()) gaps.push("연락 받을 곳");
-      if (!document.getElementById("stuck").value.trim()) gaps.push("궁금한 점");
+      Array.prototype.forEach.call(form.querySelectorAll("[required]"), function (el) {
+        if (!String(el.value || "").trim()) {
+          var lab = form.querySelector('label[for="' + el.id + '"]');
+          gaps.push(lab ? lab.textContent.replace(/\s*선택\s*$/, "").trim() : el.name);
+        }
+      });
       if (gaps.length) {
         e.preventDefault();
-        statusEl.setAttribute("data-kind", "error");
-        statusEl.textContent = gaps.join(", ") + " 항목을 채워주세요.";
+        if (statusEl) { statusEl.setAttribute("data-kind", "error"); statusEl.textContent = gaps.join(", ") + " 항목을 채워주세요."; }
         return;
       }
-      statusEl.removeAttribute("data-kind");
-      statusEl.textContent = "보내는 중입니다…";
-      submitBtn.disabled = true;
+      if (statusEl) { statusEl.removeAttribute("data-kind"); statusEl.textContent = "보내는 중입니다…"; }
+      if (submitBtn) submitBtn.disabled = true;
     });
   }
 
+  /* ── 이메일 눌러서 복사 ─────────────────────── */
+  function initCopyEmail() {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-copy]"), function (btn) {
+      var hint = btn.querySelector(".hint");
+      var original = hint ? hint.textContent : "";
+      btn.addEventListener("click", function () {
+        var text = btn.getAttribute("data-copy");
+        function done(ok) {
+          if (!hint) return;
+          hint.textContent = ok ? "복사했습니다" : "직접 선택해 복사해주세요";
+          btn.classList.toggle("done", !!ok);
+          setTimeout(function () { hint.textContent = original; btn.classList.remove("done"); }, 2200);
+        }
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(false); });
+        } else {
+          done(false);
+        }
+      });
+    });
+  }
 
-  /* ── 무료 영상 강의 목록 ────────────── */
-  function initLessons() {
-    var host = document.getElementById("lesson-list");
-    if (!host) return;
-
-    /* 영상이 붙은 강만 내보낸다. 강 번호는 원래 순번을 그대로 쓴다. */
+  /* ── 무료 영상 강의 ────────────────────────── */
+  function publishedLessons() {
     var all = window.LESSONS || [];
     var rows = [];
     all.forEach(function (L, i) {
@@ -581,20 +415,47 @@
                /^[A-Za-z0-9_-]{6,20}$/.test((L.yt || "").trim());
       if (ok) rows.push({ L: L, n: i + 1 });
     });
+    return rows;
+  }
+  function syncLessonCount(n) {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-lesson-count]"), function (el) {
+      el.textContent = n;
+    });
+  }
 
+  /* 홈의 강의 목록: lessons.js가 있으면 실제 길이까지 채운다 */
+  function initHomeLessons() {
+    var host = document.getElementById("home-lessons");
+    if (!host || !window.LESSONS) return;
+    var rows = publishedLessons();
+    if (!rows.length) return;
+    syncLessonCount(rows.length);
+    host.innerHTML = rows.map(function (row) {
+      var L = row.L;
+      return '<li><a href="' + REL + 'lessons.html#l' + row.n + '">' +
+        '<span class="no">' + row.n + '강</span>' +
+        '<span class="ttl">' + esc(L.title) + '</span>' +
+        (L.len ? '<span class="len">' + esc(L.len) + '</span>' : '') +
+        '</a></li>';
+    }).join("");
+  }
+
+  function initLessons() {
+    var host = document.getElementById("lesson-list");
+    if (!host) return;
+
+    var rows = publishedLessons();
     if (!rows.length) {
       host.innerHTML = '<p class="empty">강의를 준비하고 있습니다.</p>';
       return;
     }
-
-    /* 페이지 곳곳의 강 수를 실제 공개된 수에 맞춘다 */
-    Array.prototype.forEach.call(document.querySelectorAll("[data-lesson-count]"), function (el) {
-      el.textContent = rows.length;
-    });
+    syncLessonCount(rows.length);
 
     var bodies = window.LESSON_BODIES || {};
+    var wanted = (location.hash.match(/^#l(\d+)$/) || [])[1];
+    var openN = wanted ? Number(wanted) : rows[0].n;
 
-    host.innerHTML = rows.map(function (row, i) {
+    host.innerHTML = rows.map(function (row) {
       var L = row.L;
       var yt = (L.yt || "").trim();
       var mp4 = (L.mp4 || "").trim();
@@ -609,14 +470,11 @@
           'allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>';
       }
 
-      var bullets = (L.points || []).map(function (t) {
-        return "<li>" + esc(t) + "</li>";
-      }).join("");
-
+      var bullets = (L.points || []).map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("");
       /* 본문은 scripts/lesson-N.md 에서 만들어진 것. 이미 이스케이프돼 있다. */
       var body = bodies[row.n] || "";
 
-      return '<details class="lesson"' + (i === 0 ? " open" : "") + '>' +
+      return '<details class="lesson" id="l' + row.n + '"' + (row.n === openN ? " open" : "") + '>' +
         '<summary><span class="no">' + row.n + '강</span>' +
         '<span class="ttl">' + esc(L.title) + '</span>' +
         (L.len ? '<span class="len">' + esc(L.len) + '</span>' : '') +
@@ -625,10 +483,60 @@
         '<p class="sum">' + esc(L.sum || "") + '</p>' +
         (bullets ? "<ul>" + bullets + "</ul>" : "") +
         (body ? '<div class="lesson-body">' + body + "</div>" : "") +
+        '<div class="lesson-foot">' +
+          '<span>이 편의 내용을 직접 만들 시간이 없다면</span>' +
+          '<a href="' + REL + 'outsourcing.html">대신 만들어 드립니다 →</a>' +
+        '</div>' +
         "</div></details>";
     }).join("");
-  }
 
+    /* 왼쪽 목차 */
+    var toc = document.getElementById("lesson-toc");
+    if (toc) {
+      toc.innerHTML = rows.map(function (row) {
+        return '<li><a href="#l' + row.n + '" data-n="' + row.n + '"' + (row.n === openN ? ' aria-current="true"' : '') + '>' +
+          '<span class="no">' + row.n + '</span><span>' + esc(row.L.title) + '</span></a></li>';
+      }).join("");
+      toc.addEventListener("click", function (e) {
+        var a = e.target.closest ? e.target.closest("a[data-n]") : null;
+        if (!a) return;
+        e.preventDefault();
+        openLesson(Number(a.getAttribute("data-n")));
+        history.replaceState(null, "", "#l" + a.getAttribute("data-n"));
+      });
+    }
+
+    function openLesson(n) {
+      var d = document.getElementById("l" + n);
+      if (!d) return;
+      d.open = true;
+      d.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (toc) {
+        Array.prototype.forEach.call(toc.querySelectorAll("a[data-n]"), function (x) {
+          if (Number(x.getAttribute("data-n")) === n) x.setAttribute("aria-current", "true");
+          else x.removeAttribute("aria-current");
+        });
+      }
+    }
+    /* 열린 편이 바뀌면 목차 하이라이트도 따라간다 */
+    host.addEventListener("toggle", function (e) {
+      var d = e.target;
+      if (!d.open || !toc) return;
+      var n = Number((d.id || "").replace("l", ""));
+      Array.prototype.forEach.call(toc.querySelectorAll("a[data-n]"), function (x) {
+        if (Number(x.getAttribute("data-n")) === n) x.setAttribute("aria-current", "true");
+        else x.removeAttribute("aria-current");
+      });
+    }, true);
+
+    if (wanted) {
+      setTimeout(function () { openLesson(openN); }, 60);
+    }
+    window.addEventListener("hashchange", function () {
+      var m = location.hash.match(/^#l(\d+)$/);
+      if (m) openLesson(Number(m[1]));
+    });
+  }
 
   /* ── 프롬프트 라이브러리 ────────────── */
   function initPrompts() {
@@ -667,7 +575,7 @@
 
       if (!hits.length) {
         grid.innerHTML = '<p class="empty">찾으시는 게 없습니다. 다른 말로 검색해 보시거나, ' +
-          '아래 상담으로 남겨주시면 만들어 드립니다.</p>';
+          '문의로 남겨주시면 만들어 드립니다.</p>';
         return;
       }
 
@@ -816,15 +724,15 @@
   document.addEventListener("DOMContentLoaded", function () {
     initHeader();
     initEnrollButtons();
-    initFreePeriod();
-    preloadPayApp();
     initAuthPage();
     initMyPage();
     initAdminPage();
     initInquiryForm();
+    initCopyEmail();
+    initHomeLessons();
     initLessons();
     initPrompts();
   });
 
-  window.App = { enroll: enroll, PLANS: PLANS, COURSES: COURSES };
+  window.App = { enroll: enroll, COURSES: COURSES };
 })();

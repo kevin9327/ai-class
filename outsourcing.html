@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>외주 의뢰 — 실무AI클래스</title>
+<meta name="description" content="홈페이지·랜딩페이지, 업무 자동화, 앱·프로그램, AI 도입을 100% 온라인으로 대신 만들어 드립니다. 견적 무료, 하루 안에 회신, 결과물은 소스째 전달." />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content="외주 의뢰 — 실무AI클래스" />
+<meta property="og:description" content="만드는 건 저희가, 쓰는 건 당신이. 홈페이지·자동화·앱·AI 도입, 100% 온라인. 견적 무료." />
+<meta property="og:locale" content="ko_KR" />
+<meta property="og:url" content="https://kevin9327.github.io/ai-class/outsourcing.html" />
+<meta property="og:image" content="https://kevin9327.github.io/ai-class/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://kevin9327.github.io/ai-class/og.png" />
+<link rel="canonical" href="https://kevin9327.github.io/ai-class/outsourcing.html" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>" />
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css" />
+<link rel="stylesheet" href="./assets/style.css?v=20260905a" />
+
+<script>window.REL = "./";</script>
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js" defer></script>
+<script src="./assets/config.js?v=20260905a" defer></script>
+<script src="./assets/app.js?v=20260905a" defer></script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="./index.html">실무<b>AI</b>클래스</a>
+    <nav class="nav">
+      <a href="./lessons.html">무료 강의</a>
+      <a href="./index.html#courses">코스</a>
+      <a href="./prompts.html">프롬프트</a>
+      <a href="./outsourcing.html">외주 의뢰</a>
+      <a href="./training.html">기업 교육</a>
+      <a href="./index.html#contact">문의</a>
+    </nav>
+    <div class="nav-auth" id="nav-auth"></div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="kicker">100% 온라인 · 견적 무료 · 하루 안에 회신</p>
+    <h1>만드는 건 저희가,<br />쓰는 건 당신이</h1>
+    <p class="sub">
+      홈페이지, 업무 자동화, 앱, AI 도입. 화상 미팅과 메시지로만 진행하고
+      결과물은 소스째 드립니다. 먼저 견적부터 무료로 받아보세요.
+    </p>
+    <div class="actions">
+      <a class="btn btn-primary btn-lg" href="#request">무료 견적 요청</a>
+      <a class="btn btn-ghost btn-lg" href="./lessons.html">무료 강의로 직접 해보기</a>
+    </div>
+    <ul class="points">
+      <li>평일 저녁·주말 응답</li>
+      <li>착수 전 범위·금액·기간을 문서로 확정</li>
+      <li>소스와 설명 문서 전부 전달</li>
+    </ul>
+  </div>
+</section>
+
+<section class="section" id="services">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">SERVICES</p>
+      <h2>이런 걸 만듭니다</h2>
+      <p>강의에서 보여드리는 방식 그대로, 클로드 코드로 만듭니다. 작게 시작해서 필요한 만큼만 키우는 구성을 기본으로 합니다.</p>
+    </div>
+    <div class="svc-grid four">
+      <div class="svc">
+        <span class="num">01</span>
+        <h3>홈페이지 · 랜딩페이지</h3>
+        <p>회사·매장 소개, 신청·예약 폼, 포트폴리오, 행사 페이지. 모바일 대응과 도메인 연결까지. 서버비가 들지 않는 정적 사이트를 기본으로 합니다.</p>
+        <small>예) 1페이지 소개 + 상담 신청 폼 · 다페이지 회사 홈페이지</small>
+      </div>
+      <div class="svc">
+        <span class="num">02</span>
+        <h3>업무 자동화</h3>
+        <p>엑셀 정산·취합, 반복 문서 생성, 웹 데이터 수집, 메일·알림 자동 발송. 사람이 검토만 하면 되는 상태로 만듭니다.</p>
+        <small>예) 매달 3일 걸리던 정산 → 버튼 하나 · 경쟁사 가격 매일 자동 수집</small>
+      </div>
+      <div class="svc">
+        <span class="num">03</span>
+        <h3>앱 · 프로그램</h3>
+        <p>안드로이드 앱, 웹앱, 재고·근태·예약 같은 소규모 사내 도구. 플레이 스토어 등록까지 직접 해본 방식으로 진행합니다.</p>
+        <small>예) 매장 예약 앱 · 현장 점검 기록 도구 · 사내 신청 시스템</small>
+      </div>
+      <div class="svc">
+        <span class="num">04</span>
+        <h3>AI 도입 · 자동화 설계</h3>
+        <p>클로드·GPT를 실제 업무에 붙이는 설계, 프롬프트·에이전트 파이프라인 구축, 사내 보안 규정 안에서 쓰는 방법 자문.</p>
+        <small>예) 문의 메일 자동 분류·초안 · 보고서 초안 파이프라인</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section alt" id="process">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">PROCESS</p>
+      <h2>진행 절차</h2>
+      <p>확정 전에는 비용이 발생하지 않습니다. 금액과 지급 조건은 견적서에 명시합니다.</p>
+    </div>
+    <ol class="timeline">
+      <li><b>접수</b><span>아래 폼에 아는 만큼만 적어 보냅니다. 2분이면 됩니다.</span></li>
+      <li><b>하루 안에 회신</b><span>필요하면 30분 화상 미팅으로 요구사항을 맞춥니다. 평일 저녁이나 주말입니다.</span></li>
+      <li><b>범위 · 금액 · 기간 확정</b><span>무엇을 만들고 무엇은 안 만드는지, 얼마에, 언제까지인지 문서로 드립니다.</span></li>
+      <li><b>제작</b><span>중간 결과를 화면 공유나 링크로 보여드리고 방향을 맞춥니다.</span></li>
+      <li><b>검수 후 전달</b><span>확인하신 뒤 소스 전체와 사용 설명 문서를 드립니다. 전달 직후 확인 기간의 오류 수정은 포함입니다.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="section" id="fit">
+  <div class="wrap">
+    <div class="fit-grid">
+      <div class="fit ok">
+        <h3>맞는 분</h3>
+        <ul>
+          <li>만들 것이 어느 정도 정해져 있다</li>
+          <li>직접 배우기보다 맡기는 편이 낫다고 판단했다</li>
+          <li>화상·메시지로 소통하는 게 편하다</li>
+          <li>작게 만들어 쓰면서 필요한 만큼 키우고 싶다</li>
+        </ul>
+      </div>
+      <div class="fit no">
+        <h3>아직 아닌 분</h3>
+        <ul>
+          <li>대면 미팅이 꼭 필요하다</li>
+          <li>평일 낮 실시간 대응이 필요하다</li>
+          <li>대규모 SI나 장기 상주 인력을 찾는다</li>
+          <li>만들 것이 아직 막연하다 — 그럼 <a href="./lessons.html">무료 강의</a>부터. 직접 해보시다가 필요해지면 그때 오셔도 됩니다.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section alt" id="included">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">INCLUDED</p>
+      <h2>포함 · 미포함</h2>
+    </div>
+    <div class="fit-grid">
+      <div class="fit ok">
+        <h3>포함</h3>
+        <ul>
+          <li>결과물 소스 전체 (당신 소유)</li>
+          <li>실행·사용 설명 문서</li>
+          <li>전달 직후 확인 기간의 오류 수정 (기간은 견적서에 명시)</li>
+          <li>직접 고쳐 쓰고 싶은 분을 위한 짧은 설명 세션 (요청 시)</li>
+        </ul>
+      </div>
+      <div class="fit no">
+        <h3>미포함 · 별도</h3>
+        <ul>
+          <li>호스팅·도메인·외부 API 사용료 (실비)</li>
+          <li>지속적인 유지보수·기능 추가 (별도 협의)</li>
+          <li>원고·사진·로고 같은 콘텐츠 제작</li>
+          <li>세금계산서 — 개인 사업자가 아니라 발행이 어렵습니다. 필요하시면 접수 때 알려주세요.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="who">
+  <div class="wrap">
+    <div class="ops">
+      <div><b>평일 저녁 · 주말</b><span>응답 시간대 — 보통 하루 안에</span></div>
+      <div><b>100% 온라인</b><span>화상 · 메시지 · 화면 공유</span></div>
+      <div><b>클로드 코드</b><span>강의에서 보여드리는 그 방식으로 제작</span></div>
+      <div><b>공개 산출물</b><span><a href="https://github.com/kevin9327" target="_blank" rel="noopener">GitHub에서 직접 확인</a></span></div>
+    </div>
+    <div class="instructor" style="margin-top:22px;">
+      <div class="avatar">K</div>
+      <div>
+        <h3>만드는 사람 — 케빈 (Kevin)</h3>
+        <p>안드로이드 앱과 웹 서비스를 직접 만들어 운영하고, 오픈소스 프로젝트에 기여합니다. 제조 대기업에 재직 중이라 평일 낮에는 응답이 늦고, 대신 저녁과 주말에 집중해서 만듭니다. 이 조건이 맞지 않으면 다른 곳이 나을 수 있습니다 — 그것도 회신에서 솔직하게 말씀드립니다.</p>
+        <ul>
+          <li>구글 플레이 스토어에 앱 다수 직접 개발·출시·운영</li>
+          <li>외부 오픈소스에 머지된 PR 121건 (rhwp · OpenBot · cursor-byok 등)</li>
+          <li>제조 대기업 재직 — 보안 규정 안에서 AI를 실제로 굴려본 경험</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section alt" id="request">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">REQUEST</p>
+      <h2>무료 견적 요청</h2>
+      <p>필수는 두 칸뿐입니다. 나머지는 아는 만큼만 적어주시면 회신에서 선택지로 정리해 드립니다.</p>
+    </div>
+
+    <div class="contact-grid">
+      <form class="card" id="inquiry"
+            action="https://formsubmit.co/f4ff7f3f9ee0a68eefdaf804816b17be"
+            method="POST">
+
+        <input type="hidden" name="_subject" value="[실무AI클래스] 외주 견적 요청" />
+        <input type="hidden" name="_template" value="table" />
+        <input type="hidden" name="_captcha" value="false" />
+        <input type="hidden" name="_next" value="https://kevin9327.github.io/ai-class/thanks.html" />
+        <input type="hidden" name="구분" value="외주 견적 요청" />
+        <input type="text" name="_honey" class="trap" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+        <fieldset>
+          <legend>의뢰 유형</legend>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="의뢰유형" value="홈페이지·랜딩페이지" checked /><span>홈페이지·랜딩</span></label>
+            <label class="chip"><input type="radio" name="의뢰유형" value="업무 자동화" /><span>업무 자동화</span></label>
+            <label class="chip"><input type="radio" name="의뢰유형" value="앱·프로그램" /><span>앱·프로그램</span></label>
+            <label class="chip"><input type="radio" name="의뢰유형" value="AI 도입·설계" /><span>AI 도입·설계</span></label>
+            <label class="chip"><input type="radio" name="의뢰유형" value="아직 모름" /><span>아직 모르겠어요</span></label>
+          </div>
+        </fieldset>
+
+        <div class="field">
+          <label for="name">이름 또는 회사</label>
+          <input type="text" id="name" name="이름" autocomplete="name" placeholder="김OO 또는 OO상사" required />
+        </div>
+
+        <div class="field">
+          <label for="contact">연락 받을 곳</label>
+          <input type="text" id="contact" name="연락처" placeholder="이메일, 전화번호, 카카오톡 ID 중 편한 것" required />
+        </div>
+
+        <div class="field">
+          <label for="want">만들고 싶은 것 <span class="opt">선택</span></label>
+          <textarea id="want" name="만들고싶은것" placeholder="예) 매장 소개 페이지에 예약 폼을 붙이고 싶어요. 지금은 인스타 DM으로 받고 있는데 놓치는 게 많습니다. 아직 막막해도 괜찮습니다."></textarea>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="budget">예상 예산 <span class="opt">선택</span></label>
+            <select id="budget" name="예상예산">
+              <option value="">아직 모르겠어요</option>
+              <option>50만원 미만</option>
+              <option>50만 ~ 200만원</option>
+              <option>200만 ~ 500만원</option>
+              <option>500만원 이상</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="when">희망 시기 <span class="opt">선택</span></label>
+            <select id="when" name="희망시기">
+              <option value="">여유 있어요</option>
+              <option>1~2주 안에</option>
+              <option>한 달 안에</option>
+              <option>1~3개월</option>
+            </select>
+          </div>
+        </div>
+
+        <fieldset>
+          <legend>형태 <span class="opt">선택</span></legend>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="형태" value="일회성 제작" checked /><span>일회성 제작</span></label>
+            <label class="chip"><input type="radio" name="형태" value="지속 운영·유지보수 포함" /><span>지속 운영 포함</span></label>
+          </div>
+        </fieldset>
+
+        <div class="field">
+          <label for="ref">참고 링크 · 기존 사이트 <span class="opt">선택</span></label>
+          <input type="text" id="ref" name="참고링크" placeholder="마음에 드는 사이트, 지금 쓰는 홈페이지, 자료 링크" />
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg btn-block" id="submit">무료 견적 요청 보내기</button>
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+      </form>
+
+      <aside class="direct">
+        <p class="eyebrow">DIRECT</p>
+        <button type="button" class="copy-email" data-copy="petaflo.com@gmail.com">
+          <span class="addr">petaflo.com@gmail.com</span>
+          <span class="hint">눌러서 복사</span>
+        </button>
+        <p>폼이 불편하시면 메일로 바로 주셔도 됩니다. 제목에 [외주]를 붙여주시면 먼저 봅니다.</p>
+        <p class="small">답변 시간대: 평일 저녁 · 주말. 보통 하루 안에 회신합니다.</p>
+        <div class="direct-alt">
+          <p class="eyebrow">지금 결정하지 않으셔도 됩니다</p>
+          <a href="./lessons.html">무료 강의 8강으로 직접 해보기 →</a>
+          <a href="./prompts.html">프롬프트 32개 가져가기 →</a>
+          <a href="./index.html#contact">질문 하나만 먼저 하기 →</a>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span><b style="color:var(--ink);">실무AI클래스</b> — 전부 무료로 배우고, 필요하면 대신 만들어 드립니다</span>
+    <span>문의: <a href="mailto:petaflo.com@gmail.com">petaflo.com@gmail.com</a></span>
+    <span><a href="./privacy.html">개인정보처리방침</a></span>
+    <span>© 2026 실무AI클래스</span>
+  </div>
+</footer>
+
+</body>
+</html>
