@@ -1,0 +1,6 @@
+# Python tooling used by the content generators in this repo:
+#   scripts/build_lessons.py  (stdlib only)
+#   cardnews/make_cards.py, make_illus.py, make_proof.py  (Playwright)
+#   quote/make_quote.py                                    (Playwright + qrcode)
+playwright==1.63.0
+qrcode[pil]==8.2
